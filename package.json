@@ -1,0 +1,63 @@
+{
+  "name": "presence-se-sdk",
+  "version": "1.0.0",
+  "description": "Ticketmaster JavaScript SDK for rendering secure barcodes",
+  "main": "src/index.js",
+  "scripts": {
+    "build:prod": "webpack --config webpack.prod.js && jsdoc -c jsdoc.conf.js",
+    "build:dev": "webpack --config webpack.dev.js",
+    "docs": "jsdoc -c jsdoc.conf.js && npm start -- --openPage '/docs/public'",
+    "docs:internal": "jsdoc -c jsdoc.conf.internal.js && npm start -- --openPage '/docs/internal'",
+    "lint": "eslint src --ignore-pattern src/vendor --ignore-pattern src/jsotp",
+    "start": "webpack-dev-server --config webpack.dev.js",
+    "start:prod": "webpack-dev-server --config webpack.prod.js",
+    "test": "karma start --browsers ChromeHeadless --single-run",
+    "test:all": "karma start --browsers ChromeHeadless,Safari --single-run"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@git.tmaws.io:tmx/presence-se-js.git"
+  },
+  "author": "Ticketmaster contributors",
+  "license": "UNLICENSED",
+  "private": true,
+  "dependencies": {
+    "animejs": "^2.2.0",
+    "jssha": "^2.3.1",
+    "qrcode": "^1.3.2"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.1.2",
+    "@babel/preset-env": "^7.1.0",
+    "babel-loader": "^8.0.4",
+    "base64-image-loader": "^1.2.1",
+    "chai": "^4.2.0",
+    "clean-webpack-plugin": "^0.1.19",
+    "eslint": "^5.7.0",
+    "eslint-config-standard": "^12.0.0",
+    "eslint-loader": "^2.1.1",
+    "eslint-plugin-import": "^2.14.0",
+    "eslint-plugin-node": "^7.0.1",
+    "eslint-plugin-promise": "^4.0.1",
+    "eslint-plugin-standard": "^4.0.0",
+    "html-webpack-plugin": "^3.2.0",
+    "husky": "^1.2.0",
+    "istanbul-instrumenter-loader": "^3.0.1",
+    "jsdoc": "^3.5.5",
+    "karma": "^3.1.3",
+    "karma-chrome-launcher": "^2.2.0",
+    "karma-coverage": "^1.1.2",
+    "karma-eslint": "^2.2.0",
+    "karma-mocha": "^1.3.0",
+    "karma-mocha-reporter": "^2.2.5",
+    "karma-safari-launcher": "^1.0.0",
+    "karma-webpack": "^3.0.5",
+    "mocha": "^5.2.0",
+    "svg-inline-loader": "^0.8.0",
+    "webpack": "^4.21.0",
+    "webpack-auto-inject-version": "^1.2.2",
+    "webpack-cli": "^3.1.2",
+    "webpack-dev-server": "^3.1.14",
+    "webpack-merge": "^4.1.4"
+  }
+}

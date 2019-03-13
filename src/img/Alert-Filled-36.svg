@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="36px" height="32px" viewBox="0 0 36 32" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 52.6 (67491) - http://www.bohemiancoding.com/sketch -->
+    <title>Icons/Feedback/Alert/Alert-Filled-36</title>
+    <desc>Created with Sketch.</desc>
+    <g id="Error-States" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Barcode-error-state---example-1" transform="translate(-170.000000, -384.000000)">
+            <g id="Error" transform="translate(87.000000, 353.000000)">
+                <g id="Icons/Feedback/Alert/Alert-Filled-36" transform="translate(83.000000, 29.000000)">
+                    <path d="M1.10716259,31.5039407 L17.1316203,3.45516883 C17.4055863,2.97562625 18.0164257,2.80897351 18.4959683,3.0829395 C18.6510617,3.17154546 18.7795916,3.30007539 18.8681976,3.45516883 L34.8926553,31.5039407 C35.1666213,31.9834833 34.9999685,32.5943226 34.520426,32.8682886 C34.3693473,32.9546009 34.1983625,33 34.0243667,33 L1.97545123,33 C1.42316648,33 0.975451229,32.5522847 0.975451229,32 C0.975451229,31.8260042 1.02085033,31.6550193 1.10716259,31.5039407 Z" id="alert" stroke-opacity="0.65" stroke="#262626" fill="#FFFFFF" stroke-linecap="round"></path>
+                    <ellipse id="Oval-2" fill-opacity="0.65" fill="#262626" cx="17.9999089" cy="28.340301" rx="1.56595195" ry="1.55323299"></ellipse>
+                    <path d="M17.9999089,24.7160907 L17.9999089,24.7160907 C18.8647603,24.7160907 19.5658609,24.0149901 19.5658609,23.1501388 L19.5658609,12.8206901 C19.5658609,11.9558387 18.8647603,11.2547381 17.9999089,11.2547381 L17.9999089,11.2547381 C17.1350576,11.2547381 16.433957,11.9558387 16.433957,12.8206901 L16.433957,23.1501388 C16.433957,24.0149901 17.1350576,24.7160907 17.9999089,24.7160907 Z" id="exclamation-copy" fill-opacity="0.65" fill="#262626"></path>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

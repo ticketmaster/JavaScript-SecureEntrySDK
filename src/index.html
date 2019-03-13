@@ -1,0 +1,379 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Integration Examples and Test Page</title>
+    <style>
+        body {
+            color: #333333;
+            font-family: Averta, "Helvetica Neue", Helvetica, Arial, sans-serif;
+            background-color: #f6f7f9;
+        }
+
+        /* Start Dummy Ticket Style */
+        .ticket {
+            border-radius: 12px;
+            box-shadow: 0 0 4px 0 rgba(0,0,0,.5);
+            box-sizing: border-box;
+            color: #262626;
+            font-family: Averta, "Helvetica Neue", Helvetica, Arial, sans-serif;
+            font-size: 16px;
+            letter-spacing: 0.3px;
+            line-height: 22.4px;
+            margin: 30px;
+            text-size-adjust: 100%;
+            -webkit-font-smoothing: antialiased;
+            width: 347px;
+            display: inline-block;
+        }
+        .ticket-header {
+            background-color: #0150a7;
+            border-top-left-radius: 12px;
+            border-top-right-radius: 12px;
+            box-sizing: border-box;
+            color: white;
+            font-size: 14px;
+            line-height: 19.6px;
+            padding: 0.9rem 0;
+            position: relative;
+            text-align: center;
+        }
+        .ticket-data {
+            background-color: #026cdf;
+            color: white;
+            font-size: 16px;
+            line-height: 19.6px;
+            padding: 0.6rem 0;
+            text-align: center;
+            text-transform: capitalize;
+        }
+        .ticket-data div {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            font-size: 13px;
+            line-height: 18.2px;
+            margin-left: 0px;
+            margin-right: 0px;
+        }
+        .ticket-data-header div {
+            display: block;
+            width: 33.3%;
+        }
+        .ticket-data-values div {
+            display: block;
+            width: 33.3%;
+            font-weight: 600;
+            font-size: 18px;
+        }
+        .ticket-banner picture, .ticket-banner img {
+            max-width: 100%;
+        }
+        .ticket-details {
+            padding: 14px 20px;
+        }
+        .ticket-details div {
+            margin: auto;
+        }
+        .ticket-details h2 {
+            font-size: 16px;
+        }
+        .ticket-details span {
+            font-size: 16px;
+            display:block;
+            text-align: center;
+            line-height: 19.6px;
+            margin-top: 20px;
+        }
+        .ticket-footer {
+            color: #026cdf;
+            padding: 14px 0px;
+            text-align: center;
+            border: 1px solid #ebebeb;
+            border-bottom: none;
+        }
+        /* End Dummy Ticket Style */
+
+        .sev-raw {
+            background-color: #ebebeb;
+            margin: 20px;
+        }
+        .ideal-container {
+            width: 216px;
+            height: 160px;
+        }
+
+        .ideal-container-2x {
+            width: 432px;
+            height: 320px;
+        }
+
+        .ideal-container-barcode {
+            width: 298px;
+            height: 220px;
+        }
+
+        .non-ideal-container-square {
+            width: 300px;
+            height: 300px;
+        }
+
+        #se-dummy-tickets, #se-raw-view, .se-raw-view {
+            display: flex;
+            flex-flow: wrap;
+            align-content: center;
+        }
+    </style>
+    <script type="text/javascript">
+        const getQueryParams = () => {
+            const qs = location.search.substring(1);
+            return qs.split('&').reduce((obj, kv) => {
+                const kvParts = kv.split('=');
+                obj[kvParts[0]] = decodeURIComponent(kvParts[1]);
+                return obj;
+            }, {});
+        }
+
+        const encodeTokenObject = (tokenObject) => {
+            return btoa(JSON.stringify(tokenObject));
+        }
+    </script>
+</head>
+<body>
+
+    <template id="ticket-template">
+        <div class="ticket">
+            <div class="ticket-header">Standard Adult</div>
+            <div class="ticket-data">
+                <div class="ticket-data-header">
+                    <div>Sec</div>
+                    <div>Row</div>
+                    <div>Seat</div>
+                </div>
+                <div class="ticket-data-values">
+                    <div>304</div>
+                    <div>Q</div>
+                    <div>1</div>
+                </div>
+            </div>
+            <div class="ticket-banner">
+                <picture>
+                    <source srcset="https://s1.ticketm.net/dam/c/03e/e15ef00f-2c87-4421-ae61-d740851a703e_105891_TABLET_LANDSCAPE_LARGE_16_9.jpg 2048w,https://s1.ticketm.net/dam/c/03e/e15ef00f-2c87-4421-ae61-d740851a703e_105891_EVENT_DETAIL_PAGE_16_9.jpg 205w,https://s1.ticketm.net/dam/c/03e/e15ef00f-2c87-4421-ae61-d740851a703e_105891_TABLET_LANDSCAPE_16_9.jpg 1024w" sizes="373w"><img srcset="https://s1.ticketm.net/dam/c/03e/e15ef00f-2c87-4421-ae61-d740851a703e_105891_TABLET_LANDSCAPE_LARGE_16_9.jpg" class="_2WBwSvxxx37cDlmVv7Gu3Q _1NOumY7opE4SjPl0PgZ2Fu" alt="event" data-bdd="event-image">
+                </picture>
+            </div>
+            <div class="ticket-details">
+                    <h2></h2>
+                    <div style="width: 282px;"></div>
+                    <span></span>
+            </div>
+            <div class="ticket-footer">
+                Transfer Tickets
+            </div>
+        </div>
+    </template>
+
+    <p>
+        For quicker testing, supply a token as a `token` query parameter. For example:<br/>
+        <ul>
+            <li><a href="index.html?token=eyJiIjoiOTY0NTM3MjgzNDIxIn0=">Static Barcode</a></li>
+            <li><a href="index.html?token=eyJiIjoiOTY0NTM3MjgzMDAxIiwidCI6IlRNOjowMzo6MjAxeXRmbmllN2tpZmxzZ2hncHQ5ZDR4N2JudTljaG4zYWNwdzdocjdkOWZzc3MxcyIsImNrIjoiMzRkNmQyNTNiYjNkZTIxOTFlZDkzMGY2MmFkOGQ0ZDM4NGVhZTVmNSJ9">Secure Token</a></li>
+        </ul>
+    </p>
+
+    <div>
+        <h2>Variable size examples</h2>
+        <div  id="se-raw-views"></div>
+    </div>
+
+    <div>
+        <h2>SecureEntryViews in Dummy Tickets</h2>
+        <div id="se-dummy-tickets"></div>
+    </div>
+
+    <script type="text/javascript">
+        // Default static barcode and secure entry token tokens.
+        const DEFAULT_TOKENS = {
+            STATIC: encodeTokenObject({
+                b: '964537283421'
+            }),
+            SECURE: encodeTokenObject({
+                b: '964537283001',
+                t: 'TM::03::201ytfnie7kiflsghgpt9d4x7bnu9chn3acpw7hr7d9fsss1s',
+                ck: '34d6d253bb3de2191ed930f62ad8d4d384eae5f5'
+            }),
+            INVALID: 'invalidtoken',
+            RAW_BARCODE: '964537283421'
+        };
+
+        /**
+         * Creates and inserts an HTML element in dummy ticket chrome.
+         *
+         * @param {String} eventName - The event name to use for the ticket.
+         * @param {Object} dataAttributes - Data attributes that will be added to the SecureEventryView container element
+         * @param {String} ticketFooter - The string to render in ticket footer.
+         */
+        function createTicket(eventName, dataAttributes, ticketFooter) {
+            const ticketTemplate = document.querySelector('#ticket-template');
+            const ticket = document.importNode(ticketTemplate.content, true);
+            ticket.querySelector('.ticket-details h2').textContent = eventName;
+
+            const ticketDiv = ticket.querySelector('.ticket-details div');
+            ticketDiv.id = 'seview-' + Math.round(Math.random() * 1e10);
+            Object.keys(dataAttributes).forEach(attr => {
+                ticketDiv.dataset[attr] = dataAttributes[attr];
+            });
+
+            ticket.querySelector('.ticket-details span').textContent = ticketFooter;
+            document.querySelector('#se-dummy-tickets').appendChild(ticket);
+        }
+
+        // -----------------------------------------------------------------------------------------
+        // Create dummy tickets
+        (function () {
+            let tickets = [];
+            const token = getQueryParams().token;
+            if (token) {
+                tickets.push({ eventName: 'Query Parameter Event', dataAttributes: { token: token } });
+            }
+            tickets.push(...[
+                { eventName: 'Secure Token Event', dataAttributes: { token: DEFAULT_TOKENS.SECURE } },
+                { eventName: 'Static Barcode Event', dataAttributes: { token: DEFAULT_TOKENS.STATIC } },
+                { eventName: 'Invalid Token Event', dataAttributes: { token: 'invalidtoken' } },
+                { eventName: 'Never Load Token Event', dataAttributes: { token: 'neverload', loaddelay: -1 } },
+                { eventName: 'Load Delay Token Event', dataAttributes: { token: DEFAULT_TOKENS.SECURE, loaddelay: 2 } },
+            ]);
+
+            tickets.forEach((ticket, idx, arr) => {
+                const ticketFooter = (idx + 1) + ' of ' + arr.length + ' tickets';
+                createTicket(ticket.eventName, ticket.dataAttributes, ticketFooter);
+            });
+        })();
+
+        // -----------------------------------------------------------------------------------------
+        // Create raw SE views
+        (function () {
+            let exampleGroups = [
+                {
+                    groupName: 'Min size (216 x 160)',
+                    className: 'ideal-container sev-raw'
+                },
+                {
+                    groupName: 'Arbitrary size (298 x 220)',
+                    className: 'ideal-container-barcode sev-raw'
+                },
+                {
+                    groupName: 'Double size (298 x 220)',
+                    className: 'ideal-container-2x sev-raw'
+                },
+                {
+                    groupName: 'Square size (300 x 300)',
+                    className: 'non-ideal-container-square sev-raw'
+                }
+            ];
+
+            let examples = [
+                {
+                    name: 'Secure entry token',
+                    dataset: { token: DEFAULT_TOKENS.SECURE }
+                },
+                {
+                    name: 'Static barcode',
+                    dataset: { token: DEFAULT_TOKENS.STATIC }
+                },
+                {
+                    name: 'Raw barcode',
+                    dataset: { token: DEFAULT_TOKENS.RAW_BARCODE }
+                },
+                {
+                    name: 'Invalid token (default error text)',
+                    dataset: { token: DEFAULT_TOKENS.INVALID }
+                },
+                {
+                    name: 'Invalid token (no error text)',
+                    dataset: { token: DEFAULT_TOKENS.INVALID, errortext: '' }
+                },
+                {
+                    name: 'Invalid token (custom error text)',
+                    dataset: { token: DEFAULT_TOKENS.INVALID, errortext: 'Lorem ipsum dolor sit amet, consectetur adipiscing volutpat.' }
+                },
+                {
+                    name: 'Invalid token (error text too long)',
+                    dataset: { token: DEFAULT_TOKENS.INVALID, errortext: 'Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos volutpat.' }
+                },
+                {
+                    name: 'Loading animation (never load)',
+                    dataset: { token: DEFAULT_TOKENS.SECURE, loaddelay: '-1' }
+                },
+                {
+                    name: 'Loading animation (2s delay)',
+                    dataset: { token: DEFAULT_TOKENS.SECURE, loaddelay: '2' }
+                },
+                {
+                    name: 'Loading animation (2s delay)',
+                    dataset: { token: DEFAULT_TOKENS.STATIC, loaddelay: '2' }
+                },
+                {
+                    name: 'Loading animation (2s delay)',
+                    dataset: { token: DEFAULT_TOKENS.INVALID, loaddelay: '2' }
+                }
+            ];
+
+            exampleGroups.forEach(group => {
+                const groupContainer = document.createElement('div');
+                groupContainer.className = 'se-raw-view';
+
+                examples.forEach(example => {
+                    const exampleContainer = document.createElement('div');
+                    const exampleHeader = document.createElement('p');
+                    exampleHeader.style.textAlign = 'center';
+                    exampleHeader.innerText = example.name;
+
+                    const exampleEl = document.createElement('div');
+                    exampleEl.className = group.className;
+                    const exampleDataset = example.dataset
+                    Object.keys(exampleDataset).forEach( attr => { exampleEl.dataset[attr] = exampleDataset[attr] });
+
+                    exampleContainer.appendChild(exampleHeader);
+                    exampleContainer.appendChild(exampleEl);
+                    groupContainer.appendChild(exampleContainer);
+                });
+
+                const container = document.querySelector('#se-raw-views');
+                const groupHeader = document.createElement('h3');
+                groupHeader.innerText = group.groupName;
+                container.appendChild(groupHeader);
+                container.appendChild(groupContainer);
+            });
+        })();
+
+
+        // -----------------------------------------------------------------------------------------
+        // The html-webpack-plugin adds script tag at end of body, so we try to
+        // wait to render.
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('[data-token]').forEach(token => {
+                token.id = 'seview-container-' + Math.round(Math.random() * 1e10);
+
+                const options = { selector: '#' + token.id };
+
+                token.dataset.errortext && (options.errorText = token.dataset.errortext === 'null' ? null : token.dataset.errortext);
+
+                const seView = new Presence.SecureEntryView(options);
+
+                const loadDelay = parseInt(token.dataset.loaddelay) || 0;
+                if (loadDelay === 0) {
+                    // options.token = token.dataset.token;
+                    seView.setToken(token.dataset.token);
+                } else if (loadDelay > 0) {
+                    setTimeout(() => {
+                        seView.setToken(token.dataset.token);
+                    }, loadDelay * 1000);
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>
