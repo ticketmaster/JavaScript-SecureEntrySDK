@@ -46,22 +46,27 @@ const commonConfig = {
                     multiLineCommentType: true
                 }
             }
-        }),
-        new HtmlWebpackPlugin({
-            hash: true,
-            insert: 'head',
-            template: './src/index.html'
         })
     ],
-    devtool: 'source-map',
-    devServer: {
-        contentBase: './dist',
-        port: 9000,
-        open: true
-    }
+    devtool: 'source-map'
 };
 
 module.exports = [
+    // Default 'var' config is separate to support `npm run start`.
+    merge(commonConfig, {
+        plugins: [
+            new HtmlWebpackPlugin({
+                hash: true,
+                insert: 'head',
+                template: './src/index.html'
+            })
+        ],
+        devServer: {
+            contentBase: './dist',
+            port: 9000,
+            open: true
+        }
+    }),
     // Create bundles specific to each supported module system.
     ...['amd'].map(target => {
         return merge(commonConfig, {
@@ -72,7 +77,5 @@ module.exports = [
                 libraryTarget: target
             }
         });
-    }),
-    // Run default 'var' config last so it will be used if `npm run start:prod` is run.
-    commonConfig
+    })
 ]

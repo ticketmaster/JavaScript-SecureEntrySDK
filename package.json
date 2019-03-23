@@ -1,6 +1,6 @@
 {
   "name": "presence-se-sdk",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Ticketmaster JavaScript SDK for rendering secure barcodes",
   "main": "src/index.js",
   "scripts": {
@@ -16,7 +16,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@git.tmaws.io:tmx/presence-se-js.git"
+    "url": "git@github.com:ticketmaster/JavaScript-SecureEntrySDK.git"
   },
   "author": "Ticketmaster contributors",
   "license": "UNLICENSED",

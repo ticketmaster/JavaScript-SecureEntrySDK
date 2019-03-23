@@ -3,7 +3,7 @@
  */
 
 const utils = require('./utils');
-const { TokenSigner, SegmentType } = require('./token');
+const { TokenSigner, DisplayType } = require('./token');
 const { ErrorView } = require('./error-view');
 const { StaticBarcodeView } = require('./static-barcode-view');
 const { SecureTokenView } = require('./secure-token-view');
@@ -33,17 +33,19 @@ const _mode = new WeakMap();
 
 /**
  * @typedef InternalRendererConfiguration
- * @property {String} selector - A `DOMString` containing a selector to match.
- * @property {String} token - A valid token.
+ * @property {String} [selector] - A `DOMString` containing a selector to match.
+ * @property {String} [token] - A valid token.
+ * @property {Object} [error] - An error object.
  * @property {String} [brandingColor] - A color.
- * @property {String} [errorText] - Text to display when parsing token fails.
+ * @property {String} [errorText] - Deprecated: Use `parseErrorText` instead.
+ * @property {String} [parseErrorText] - Text to display when parsing token fails.
  * @property {RenderModes} [renderMode] - Render mode.
  */
 
 // TODO: More appropriate name, SecureEntryViewController?
 /**
  *
- * @param {InternalRendererConfiguration} options - Renderer configuration.
+ * @param {InternalRendererConfiguration} [options] - Renderer configuration.
  */
 class InternalRenderer {
     constructor(options = {}) {
@@ -77,8 +79,9 @@ class InternalRenderer {
 
         this._token = options.token;
         this._tokenSigner = new TokenSigner(this._token);
+        this.parseErrorText = options.parseErrorText || options.errorText;
+
         this.brandingColor = options.brandingColor || DEFAULT_BRANDING_COLOR;
-        this.errorText = options.errorText;
 
         (_mode.get(this) === RenderModes.IMMEDIATE && this.isRenderable) && this.render();
     }
@@ -158,6 +161,26 @@ class InternalRenderer {
         }
     }
 
+    /**
+     * The error the renderer should render.
+     *
+     * If `selector` is set and `mode` is `RenderModes.IMMEDIATE`, will
+     * automatically render.
+     *
+     * @type {Object}
+     */
+    get error() {
+        return this._error;
+    }
+
+    set error(err) {
+        this._error = err;
+
+        if (this.mode === RenderModes.IMMEDIATE) {
+            this.render();
+        }
+    }
+
     // TODO: Prefix internal methods with '_'.
     /**
      * Whether or not the renderer is currently renderable.
@@ -166,7 +189,7 @@ class InternalRenderer {
      * @type {Boolean}
      */
     get isRenderable() {
-        return !!(this.selector && this.token);
+        return !!(this.selector && (this.token || this.error));
     }
 
     // TODO: Prefix internal methods with '_'.
@@ -188,16 +211,12 @@ class InternalRenderer {
                 overflow: 'hidden'
             });
 
-            const viewOptions = {
-                id: _id.get(this),
-                w: this._viewContainer.clientWidth,
-                h: this._viewContainer.clientHeight,
-                color: this.brandingColor || DEFAULT_BRANDING_COLOR,
-                errorText: this.errorText
-            };
-
             if (!this._loadingView) {
-                this._loadingView = new LoadingView(viewOptions);
+                this._loadingView = new LoadingView({
+                    id: _id.get(this),
+                    w: this._viewContainer.clientWidth,
+                    h: this._viewContainer.clientHeight
+                });
                 utils.applyStyle(this._loadingView.el, { opacity: 1 });
                 this._viewContainer.appendChild(this._loadingView.el);
             }
@@ -229,13 +248,18 @@ class InternalRenderer {
             w: this._viewContainer.clientWidth,
             h: this._viewContainer.clientHeight,
             color: this.brandingColor || DEFAULT_BRANDING_COLOR,
-            errorText: this.errorText
+            errorText: this.parseErrorText
         };
 
-        const segmentType = this._tokenSigner.segmentType;
+        if (this.error) {
+            viewOptions.errorText = this.error.text;
+            viewOptions.iconURL = this.error.iconURL;
+        }
+
+        const displayType = this._tokenSigner.displayType;
 
         // We always render at least a QR code or error state.
-        let BarcodeViewClass = (segmentType === SegmentType.UNKNOWN) ? ErrorView : StaticBarcodeView;
+        let BarcodeViewClass = (displayType === DisplayType.INVALID) ? ErrorView : StaticBarcodeView;
         this._barcodeView = new BarcodeViewClass(viewOptions);
         let mainContentViewEl = this._barcodeView.el;
         utils.applyStyle(this._barcodeView.el, { opacity: 0 });
@@ -244,14 +268,17 @@ class InternalRenderer {
         this._barcodeView.render(this._tokenSigner.barcode);
 
         // If we have RET, we'll enhance qr code view with secure token view
-        if (segmentType === SegmentType.ROTATING_SYMBOLOGY) {
+        if (displayType === DisplayType.ROTATING || displayType === DisplayType.STATIC_PDF) {
             // Setup SecureTokenView
             this._secureTokenView = new SecureTokenView(viewOptions);
             mainContentViewEl = this._secureTokenView.el;
             this._secureTokenView.render(this._tokenSigner.generateSignedToken());
-            setInterval(() => {
-                this._secureTokenView.render(this._tokenSigner.generateSignedToken());
-            }, REFRESH_INTERVAL * 1000);
+
+            if (displayType === DisplayType.ROTATING) {
+                setInterval(() => {
+                    this._secureTokenView.render(this._tokenSigner.generateSignedToken());
+                }, REFRESH_INTERVAL * 1000);
+            }
 
             // Add toggle button
             this._toggleButton = new ToggleButton({
@@ -270,7 +297,7 @@ class InternalRenderer {
 
         // Now that we've rendered content, fade in the main content view.
         utils.swapElementStyles(this._loadingView.el, mainContentViewEl, ['opacity']);
-        if (segmentType === SegmentType.ROTATING_SYMBOLOGY) {
+        if (displayType === DisplayType.ROTATING || displayType === DisplayType.STATIC_PDF) {
             utils.swapElementStyles(this._loadingView.el, this._toggleButton.el, ['opacity']);
         }
     }

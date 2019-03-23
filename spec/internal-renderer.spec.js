@@ -97,6 +97,28 @@ describe('internal-renderer', () => {
             const el = container.querySelector('div[id*=pseerrorview]');
             expect(el).to.exist;
         });
+
+        it('should render a custom error', () => {
+            const renderer = new InternalRenderer({
+                renderMode: RenderModes.IMMEDIATE
+            });
+            expect(container.hasChildNodes()).to.be.false;
+
+            renderer.selector = containerSelector;
+            renderer.error = {
+                text: 'Custom error text',
+                iconURL: 'avalidurl'
+            };
+
+            const el = container.querySelector('div[id*=pseerrorview]');
+            expect(el).to.exist;
+
+            const textEl = el.querySelector('p');
+            expect(textEl.innerText).to.equal('Custom error text');
+
+            const imageEl = el.querySelector('img');
+            expect(imageEl.src).to.match(/avalidurl$/);
+        });
     });
 
     describe('RenderModes.DEFERRED', () => {
@@ -158,6 +180,27 @@ describe('internal-renderer', () => {
 
             const el = container.querySelector('div[id*=pseerrorview]');
             expect(el).to.exist;
+        });
+
+        it('should render a custom error', () => {
+            const renderer = new InternalRenderer();
+            renderer.selector = containerSelector;
+            renderer.error = {
+                text: 'Custom error text',
+                iconURL: 'avalidurl'
+            };
+            expect(container.hasChildNodes()).to.be.false;
+
+            renderer.render();
+
+            const el = container.querySelector('div[id*=pseerrorview]');
+            expect(el).to.exist;
+
+            const textEl = el.querySelector('p');
+            expect(textEl.innerText).to.equal('Custom error text');
+
+            const imageEl = el.querySelector('img');
+            expect(imageEl.src).to.match(/avalidurl$/);
         });
     });
 

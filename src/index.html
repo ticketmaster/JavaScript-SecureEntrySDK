@@ -195,17 +195,25 @@
     <script type="text/javascript">
         // Default static barcode and secure entry token tokens.
         const DEFAULT_TOKENS = {
-            STATIC: encodeTokenObject({
-                b: '964537283421'
-            }),
-            SECURE: encodeTokenObject({
+            ROTATING: encodeTokenObject({
                 b: '964537283001',
                 t: 'TM::03::201ytfnie7kiflsghgpt9d4x7bnu9chn3acpw7hr7d9fsss1s',
                 ck: '34d6d253bb3de2191ed930f62ad8d4d384eae5f5'
             }),
+            STATIC_PDF: encodeTokenObject({
+                b: '964537283001',
+                rt: 'rotating_symbology'
+            }),
+            STATIC_QR: encodeTokenObject({
+                b: '964537283421',
+                rt: 'barcode'
+            }),
             INVALID: 'invalidtoken',
-            RAW_BARCODE: '964537283421'
+            RAW_BARCODE: '964537283421',
+            NULL: null
         };
+
+        const ERROR_ICON_DATA_URI = 'data:image/png;base64,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';
 
         /**
          * Creates and inserts an HTML element in dummy ticket chrome.
@@ -238,11 +246,12 @@
                 tickets.push({ eventName: 'Query Parameter Event', dataAttributes: { token: token } });
             }
             tickets.push(...[
-                { eventName: 'Secure Token Event', dataAttributes: { token: DEFAULT_TOKENS.SECURE } },
-                { eventName: 'Static Barcode Event', dataAttributes: { token: DEFAULT_TOKENS.STATIC } },
+                { eventName: 'Secure Token Event', dataAttributes: { token: DEFAULT_TOKENS.ROTATING } },
+                { eventName: 'Static Barcode Event', dataAttributes: { token: DEFAULT_TOKENS.STATIC_QR } },
                 { eventName: 'Invalid Token Event', dataAttributes: { token: 'invalidtoken' } },
                 { eventName: 'Never Load Token Event', dataAttributes: { token: 'neverload', loaddelay: -1 } },
-                { eventName: 'Load Delay Token Event', dataAttributes: { token: DEFAULT_TOKENS.SECURE, loaddelay: 2 } },
+                { eventName: 'Load Delay Token Event', dataAttributes: { token: DEFAULT_TOKENS.ROTATING, loaddelay: 2 } },
+                { eventName: 'Integrator provided error', dataAttributes: { token: DEFAULT_TOKENS.NULL, errortext: 'Error 207 - Ticket not found', erroriconurl: ERROR_ICON_DATA_URI } }
             ]);
 
             tickets.forEach((ticket, idx, arr) => {
@@ -276,15 +285,23 @@
             let examples = [
                 {
                     name: 'Secure entry token',
-                    dataset: { token: DEFAULT_TOKENS.SECURE }
+                    dataset: { token: DEFAULT_TOKENS.ROTATING }
+                },
+                {
+                    name: 'Secure entry token (non-rotating)',
+                    dataset: { token: DEFAULT_TOKENS.STATIC_PDF }
                 },
                 {
                     name: 'Static barcode',
-                    dataset: { token: DEFAULT_TOKENS.STATIC }
+                    dataset: { token: DEFAULT_TOKENS.STATIC_QR }
                 },
                 {
                     name: 'Raw barcode',
                     dataset: { token: DEFAULT_TOKENS.RAW_BARCODE }
+                },
+                {
+                    name: 'Integrator provided error',
+                    dataset: { token: DEFAULT_TOKENS.NULL, errortext: 'Error 207 - Ticket not found', erroriconurl: ERROR_ICON_DATA_URI }
                 },
                 {
                     name: 'Invalid token (default error text)',
@@ -292,27 +309,27 @@
                 },
                 {
                     name: 'Invalid token (no error text)',
-                    dataset: { token: DEFAULT_TOKENS.INVALID, errortext: '' }
+                    dataset: { token: DEFAULT_TOKENS.INVALID, parseerrortext: '' }
                 },
                 {
                     name: 'Invalid token (custom error text)',
-                    dataset: { token: DEFAULT_TOKENS.INVALID, errortext: 'Lorem ipsum dolor sit amet, consectetur adipiscing volutpat.' }
+                    dataset: { token: DEFAULT_TOKENS.INVALID, parseerrortext: 'Lorem ipsum dolor sit amet, consectetur adipiscing volutpat.' }
                 },
                 {
                     name: 'Invalid token (error text too long)',
-                    dataset: { token: DEFAULT_TOKENS.INVALID, errortext: 'Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos volutpat.' }
+                    dataset: { token: DEFAULT_TOKENS.INVALID, parseerrortext: 'Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos volutpat.' }
                 },
                 {
                     name: 'Loading animation (never load)',
-                    dataset: { token: DEFAULT_TOKENS.SECURE, loaddelay: '-1' }
+                    dataset: { token: DEFAULT_TOKENS.ROTATING, loaddelay: '-1' }
                 },
                 {
                     name: 'Loading animation (2s delay)',
-                    dataset: { token: DEFAULT_TOKENS.SECURE, loaddelay: '2' }
+                    dataset: { token: DEFAULT_TOKENS.ROTATING, loaddelay: '2' }
                 },
                 {
                     name: 'Loading animation (2s delay)',
-                    dataset: { token: DEFAULT_TOKENS.STATIC, loaddelay: '2' }
+                    dataset: { token: DEFAULT_TOKENS.STATIC_QR, loaddelay: '2' }
                 },
                 {
                     name: 'Loading animation (2s delay)',
@@ -358,9 +375,18 @@
 
                 const options = { selector: '#' + token.id };
 
-                token.dataset.errortext && (options.errorText = token.dataset.errortext === 'null' ? null : token.dataset.errortext);
+                token.dataset.parseerrortext && (options.errorText = token.dataset.parseerrortext === 'null' ? null : token.dataset.parseerrortext);
 
                 const seView = new Presence.SecureEntryView(options);
+
+                const error = {
+                    text: token.dataset.errortext,
+                    iconURL: token.dataset.erroriconurl
+                };
+                if (token.dataset.token === 'null' && error.text && error.iconURL) {
+                    seView.showError(error);
+                    return;
+                }
 
                 const loadDelay = parseInt(token.dataset.loaddelay) || 0;
                 if (loadDelay === 0) {

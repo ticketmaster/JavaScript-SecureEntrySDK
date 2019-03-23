@@ -1,5 +1,5 @@
 const expect = require('chai').expect;
-const { TokenSigner, SegmentType } = require('../src/token');
+const { TokenSigner, DisplayType } = require('../src/token');
 const { objectToEncodedToken } = require('./helpers');
 
 const ERROR_BARCODE = 'errorbarcode';
@@ -67,7 +67,7 @@ describe('TokenSigner', () => {
 
         validBarcodes.forEach(barcode => {
             const tokenSigner = new TokenSigner(barcode);
-            expect(tokenSigner.segmentType).to.equal(SegmentType.BARCODE);
+            expect(tokenSigner.displayType).to.equal(DisplayType.STATIC_QR);
             expectMappedPropertiesToEqual({ b: barcode }, tokenSigner);
         });
     });
@@ -95,7 +95,7 @@ describe('TokenSigner', () => {
 
         invalidBarcodes.forEach(barcode => {
             const tokenSigner = new TokenSigner(barcode);
-            expect(tokenSigner.segmentType).to.equal(SegmentType.UNKNOWN);
+            expect(tokenSigner.displayType).to.equal(DisplayType.INVALID);
             expectMappedPropertiesToEqual({ b: 'errorbarcode' }, tokenSigner);
         });
     });
@@ -111,9 +111,9 @@ describe('TokenSigner', () => {
             expect(tokenSigner[tokenSignerProperty], `topic [${tokenSignerProperty}]`).to.equal(decodedRotatingEntryToken[key]);
         });
 
-        const originalSegmentType = tokenSigner.segmentType;
-        tokenSigner.segmentType = 'new-segment-type';
-        expect(tokenSigner.segmentType).to.equal(originalSegmentType);
+        const originalDisplayType = tokenSigner.displayType;
+        tokenSigner.displayType = 'new-segment-type';
+        expect(tokenSigner.displayType).to.equal(originalDisplayType);
     });
 
     it('should create an "errorbarcode" when provided invalid token strings', () => {
@@ -125,7 +125,7 @@ describe('TokenSigner', () => {
         invalidTokenStrings.forEach(tokenString => {
             const tokenSigner = new TokenSigner(tokenString);
             expect(tokenSigner.barcode).to.equal(ERROR_BARCODE);
-            expect(tokenSigner.segmentType).to.equal(SegmentType.UNKNOWN);
+            expect(tokenSigner.displayType).to.equal(DisplayType.INVALID);
         });
     });
 

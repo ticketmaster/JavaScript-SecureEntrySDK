@@ -28,7 +28,8 @@ describe('SecureEntryView', () => {
                 'setToken',
                 'setSelector',
                 'setBrandingColor',
-                'setErrorText'
+                'setErrorText',
+                'showError'
             ]
         });
     });
@@ -62,6 +63,7 @@ describe('SecureEntryView', () => {
         let container;
         let selector;
         const token = '123456';
+        const error = { text: 'error text', iconURL: 'iconurl' };
         let view;
 
         beforeEach(() => {
@@ -115,6 +117,23 @@ describe('SecureEntryView', () => {
             view.setToken(token);
 
             const el = container.querySelector('div[id*=pseview]');
+            expect(el).to.exist;
+        });
+
+        it('should immediately render an error with no options object in constructor', () => {
+            view = new SecureEntryView();
+            view.setSelector(selector);
+            view.showError(error);
+
+            const el = container.querySelector('div[id*=pseerrorview]');
+            expect(el).to.exist;
+        });
+
+        it('should immediately render an error with options object in constructor', () => {
+            view = new SecureEntryView({ selector });
+            view.showError(error);
+
+            const el = container.querySelector('div[id*=pseerrorview]');
             expect(el).to.exist;
         });
     });

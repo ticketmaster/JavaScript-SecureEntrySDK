@@ -5,17 +5,24 @@ const alertIcon = require('./img/Alert-Filled-36.svg');
 
 const DEFAULT_ERROR_TEXT = 'Reload ticket';
 const MAX_ERROR_TEXT_LENGTH = 60;
+const DEFAULT_ICON_URL = `data:image/svg+xml;base64,${global.btoa(alertIcon)}`;
 
 /**
  * A class representing an invalid token.
  */
 class ErrorView extends TokenViewBase {
     constructor(options = {}) {
-        const defaults = { idPrefix: 'pseerrorview', errorText: DEFAULT_ERROR_TEXT };
+        const defaults = {
+            idPrefix: 'pseerrorview',
+            errorText: DEFAULT_ERROR_TEXT,
+            iconURL: DEFAULT_ICON_URL
+        };
         const mergedOptions = { ...defaults, ...options };
         super(mergedOptions);
 
         this._errorMessage = isValidErrorText(mergedOptions.errorText) ? mergedOptions.errorText : DEFAULT_ERROR_TEXT;
+        this._iconURL = isValidImageURL(mergedOptions.iconURL) ? mergedOptions.iconURL : DEFAULT_ICON_URL;
+        this._icon.src = this._iconURL;
     }
 
     setSize({ containerWidth, containerHeight }) {
@@ -43,9 +50,9 @@ class ErrorView extends TokenViewBase {
             fontFamily: '-apple-system, BlinkMacSystemFont, "Roboto", "Fira Sans", "Helvetica Neue", sans-serif'
         });
 
-        const img = createElement('img',
+        this._icon = createElement('img',
             {
-                src: `data:image/svg+xml;base64,${global.btoa(alertIcon)}`,
+                src: this._iconURL,
                 width: errorDimensions.iconWidth,
                 height: errorDimensions.iconHeight
             },
@@ -53,7 +60,7 @@ class ErrorView extends TokenViewBase {
                 margin: `auto auto ${containerWidth * errorDimensions.internalPaddingPercentage}px auto`
             }
         );
-        this.el.appendChild(img);
+        this.el.appendChild(this._icon);
 
         const txt = createElement('p',
             null,
@@ -80,6 +87,16 @@ class ErrorView extends TokenViewBase {
  */
 const isValidErrorText = errorText => typeof errorText === 'string' && errorText.length <= MAX_ERROR_TEXT_LENGTH;
 
+/**
+ * Returns whether or not supplied image url is valid.
+ *
+ * @param {Any} imageURL
+ */
+const isValidImageURL = imageURL => typeof imageURL === 'string' && imageURL !== '';
+
 module.exports = {
-    ErrorView
+    ErrorView,
+    DEFAULT_ERROR_TEXT,
+    DEFAULT_ICON_URL,
+    MAX_ERROR_TEXT_LENGTH
 };

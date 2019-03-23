@@ -11,14 +11,15 @@ const _renderer = new WeakMap();
  *
  * A token will be rendered immediately after the instance is "renderable".
  *
- * A renderable token has a valid CSS query selector and token. These can be
- * provided on object instantiation or via setter methods afterward.
+ * The view is considered renderable when it has a valid CSS query selector and
+ * a token or an error is set with `showError`.
  *
- * @param {Object} options - Configuration options for the renderer.
- * @param {String} options.selector - A selector for the HTML container element the token will render in.
- * @param {String} options.token - A secure token retrieved from the Presence Delivery API.
+ * @param {Object} [options] - Configuration options for the renderer.
+ * @param {String} [options.selector] - A selector for the HTML container element the token will render in.
+ * @param {String} [options.token] - A secure token retrieved from the Presence Delivery API.
+ * @param {Object} [options.error] - An error object.
  * @param {String} [options.brandingColor] - A CSS hex color value.
- * @param {String} [options.errorText] - The error text to use if token parsing fails. Defaults to "Reload ticket"
+ * @param {String} [options.errorText] Deprecated: Use optional parameter to `setToken` instead.
  *
  * @example
  * const seView = new Presence.SecureEntryView({
@@ -44,7 +45,7 @@ class SecureEntryView {
      *
      * If a valid token is already set, the token will be rendered immediately.
      *
-     * @param {String} - A selector for the HTML container element the token will render in.
+     * @param {String} sel - A selector for the HTML container element the token will render in.
      * @example
      * const seView = new Presence.SecureEntryView();
      * seView.setSelector('#token-container');
@@ -60,13 +61,25 @@ class SecureEntryView {
      *
      * If a valid selector is already set, the token will be rendered immediately.
      *
-     * @param {String} - A secure token retrieved from the Presence Delivery API.
+     * Optionally customize any token parsing errors.
+     *
+     * Note that there is 60 character limit. If the character limit is
+     * exceeded, the text "Reload ticket" is rendered instead.
+     *
+     * @param {String} token - A secure token retrieved from the Presence Delivery API.
+     * @param {String} [parseErrorText] - The error text to use if token parsing fails. Defaults to "Reload ticket"
      * @example
      * const seView = new Presence.SecureEntryView();
      * seView.setToken('123456');
+     *
+     * const seView = new Presence.SecureEntryView();
+     * seView.setToken('123456', 'Please visit the box office');
      */
-    setToken(token) {
-        _renderer.get(this).token = token;
+    setToken(token, parseErrorText) {
+        /** @type InternalRenderer */
+        const renderer = _renderer.get(this);
+        renderer.parseErrorText = parseErrorText;
+        renderer.token = token;
     }
 
     /**
@@ -86,6 +99,8 @@ class SecureEntryView {
     /**
      * @public
      * @description
+     * Deprecated: Use `setToken(token, parseErrorText)` instead.
+     *
      * Sets the error text to display if there is an error parsing the provided
      * token.
      *
@@ -98,7 +113,29 @@ class SecureEntryView {
      * seView.setErrorText('Please visit the box office');
      */
     setErrorText(errorText) {
-        _renderer.get(this).errorText = errorText;
+        _renderer.get(this).parseErrorText = errorText;
+    }
+
+    /**
+     * @public
+     * @description
+     * Displays a custom error message.
+     *
+     * Note that there is 60 character limit. If the character limit is
+     * exceeded, the text "Reload ticket" is rendered instead.
+     *
+     * @param {Object} error - An error object.
+     * @param {String} error.text - The text of the error
+     * @param {String} [error.iconURL] - A URL for a 36x32 image for the error icon.
+     * @example
+     * const seView = new Presence.SecureEntryView();
+     * seView.showError({
+     *     text: 'Ticket not found'
+     *     iconURL: 'https://your-cdn.com/36x32-error.png'
+     * });
+     */
+    showError(error) {
+        _renderer.get(this).error = error;
     }
 }
 
