@@ -3,6 +3,7 @@ const { testObjectAPI } = require('./helpers');
 const { SecureEntryView } = require('../src/views/secure-entry-view');
 const { RenderModes } = require('../src/controllers/internal-renderer');
 const { getRandomIdentifier } = require('../src/helpers/utils');
+const { InternalRenderer } = require('../src/controllers/internal-renderer');
 
 describe('SecureEntryView', () => {
     it('should be instantiated with `new`', () => {
@@ -30,6 +31,9 @@ describe('SecureEntryView', () => {
                 'setBrandingColor',
                 'setErrorText',
                 'showError',
+                'enableBrandedSubtitle',
+                'setPDF417Subtitle',
+                'setQRCodeSubtitle',
                 'teardown'
             ]
         });
@@ -130,6 +134,40 @@ describe('SecureEntryView', () => {
 
             const el = container.querySelector('div[id*=pseerrorview]');
             expect(el).to.exist;
+        });
+    });
+
+    describe('barcode subtitle', () => {
+        let view;
+        let internalRenderer;
+        const expectedDefaultSubtitle = 'Screenshots are not valid';
+
+        beforeEach(() => {
+            internalRenderer = new InternalRenderer();
+            view = new SecureEntryView({}, internalRenderer);
+        });
+
+        it('should allow enabling branded subtitle', () => {
+            expect(internalRenderer.isBrandingColoredSubtitleEnabled).to.be.false;
+
+            view.enableBrandedSubtitle(true);
+            expect(internalRenderer.isBrandingColoredSubtitleEnabled).to.be.true;
+        });
+
+        it('should allow setting PDF417 subtitle', () => {
+            expect(internalRenderer.pdf417Subtitle).to.equal(expectedDefaultSubtitle);
+
+            const expectedSubtitle = 'Custom PDF417 subtitle';
+            view.setPDF417Subtitle(expectedSubtitle);
+            expect(internalRenderer.pdf417Subtitle).to.equal(expectedSubtitle);
+        });
+
+        it('should allow setting QR code subtitle', () => {
+            expect(internalRenderer.qrCodeSubtitle).to.equal(expectedDefaultSubtitle);
+
+            const expectedSubtitle = 'Custom QR code subtitle';
+            view.setQRCodeSubtitle(expectedSubtitle);
+            expect(internalRenderer.qrCodeSubtitle).to.equal(expectedSubtitle);
         });
     });
 });

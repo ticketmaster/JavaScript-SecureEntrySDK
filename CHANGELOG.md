@@ -3,6 +3,20 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [1.0.3] - 2019-06-14
+### Changed
+- Changed PDF417 and QR code toggle trigger and animation. The touch area is now the entire
+`SecureEntryView` and presentation animation is now cross fade.
+
+### Added
+- Support for displaying a configurable barcode subtitle, which by default reads 'Screenshots
+are not valid'. This informs users they may not screenshot SafeTix barcodes for event entry.
+Configuration can be done with:
+    - `setPDF417Subtitle` and `setQRCodeSubtitle` which set text for each barcode variant. A falsy
+      value removes subtitle completely.
+    - `enableBrandedSubtitle` which allows subtitle text color customization matching the
+      color provided in `setBrandingColor`.
+
 ## [1.0.2] - 2019-04-24
 ### Improved
 - Branding color handling.

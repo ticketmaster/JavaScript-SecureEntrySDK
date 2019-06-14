@@ -2,7 +2,8 @@ module.exports = {
     opts: {
         access: 'public',
         destination: 'dist/docs/public',
-        tutorials: 'tutorials'
+        tutorials: 'tutorials',
+        recurse: true
     },
     source: {
         include: ['src'],

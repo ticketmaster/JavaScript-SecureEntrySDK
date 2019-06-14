@@ -70,4 +70,50 @@ describe('secure-token-view', () => {
             expect(style.transform).to.equal('scaleY(-1)');
         });
     });
+
+    describe('barcode subtitle', () => {
+        const subtitle = 'subtitle';
+        const subtitleSelector = 'p[id*=subtitle]';
+
+        it('should not render subtitle when not provided in constructor', () => {
+            const view = new SecureTokenView();
+            expect(view.el.querySelector(`subtitle`)).to.not.exist;
+        });
+
+        it('should not render subtitle when property set to nil', () => {
+            const view = new SecureTokenView();
+
+            expect(view.el.querySelector(subtitleSelector)).to.not.exist;
+
+            view.subtitle = subtitle;
+
+            const subtitleEl = view.el.querySelector(subtitleSelector);
+            expect(subtitleEl).to.exist;
+            expect(subtitleEl.innerHTML).to.equal(subtitle);
+
+            view.subtitle = null;
+            expect(view.el.querySelector(subtitleSelector)).to.not.exist;
+        });
+
+        it('should render subtitle when provided in constructor', () => {
+            const view = new SecureTokenView({ subtitle });
+
+            const subtitleEl = view.el.querySelector(subtitleSelector);
+            expect(subtitleEl).to.exist;
+            expect(subtitleEl.innerHTML).to.equal(subtitle);
+        });
+
+        it('should render subtitle when provided in property', () => {
+            const view = new SecureTokenView();
+
+            let subtitleEl = view.el.querySelector(subtitleSelector);
+            expect(subtitleEl).to.not.exist;
+
+            view.subtitle = subtitle;
+
+            subtitleEl = view.el.querySelector(subtitleSelector);
+            expect(subtitleEl).to.exist;
+            expect(subtitleEl.innerHTML).to.equal(subtitle);
+        });
+    });
 });

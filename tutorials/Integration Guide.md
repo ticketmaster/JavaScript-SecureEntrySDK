@@ -1,5 +1,5 @@
 ## Secure Entry for JavaScript
-v1.0.2+
+v1.0.3+
 
 ## Introduction
 
@@ -54,6 +54,9 @@ QR code fallback:
     * [.setBrandingColor(color)](#SecureEntryView+setBrandingColor)
     * [.setErrorText(errorText)](#SecureEntryView+setErrorText)
     * [.showError(error)](#SecureEntryView+showError)
+    * [.enableBrandedSubtitle(isEnabled)](#SecureEntryView+enableBrandedSubtitle)
+    * [.setPDF417Subtitle(subtitle)](#SecureEntryView+setPDF417Subtitle)
+    * [.setQRCodeSubtitle(subtitle)](#SecureEntryView+setQRCodeSubtitle)
     * [.teardown()](#SecureEntryView+teardown)
 
 <a name="new_SecureEntryView_new"></a>
@@ -203,6 +206,64 @@ seView.showError({
     text: 'Ticket not found'
     iconURL: 'https://your-cdn.com/36x32-error.png'
 });
+```
+<a name="SecureEntryView+enableBrandedSubtitle"></a>
+
+### secureEntryView.enableBrandedSubtitle(isEnabled)
+Allows branding color on subtitle text to be enabled.
+
+**Kind**: instance method of [<code>SecureEntryView</code>](#SecureEntryView)
+**Access**: public
+
+| Param | Type | Description |
+| --- | --- | --- |
+| isEnabled | <code>Boolean</code> | Whether or not subtitle should use branding color |
+
+**Example**
+```js
+const seView = new Presence.SecureEntryView();
+seView.setBrandingColor('#076CD9');
+seView.enableBrandedSubtitle(true)
+```
+<a name="SecureEntryView+setPDF417Subtitle"></a>
+
+### secureEntryView.setPDF417Subtitle(subtitle)
+Creates a custom subtitle for the PDF417 variant of the SafeTix ticket.
+Will truncate if longer than the barcode.
+
+Note: If set to a falsy value, the barcode subtitle will be hidden.
+
+**Kind**: instance method of [<code>SecureEntryView</code>](#SecureEntryView)
+**Access**: public
+
+| Param | Type | Description |
+| --- | --- | --- |
+| subtitle | <code>String</code> | The text to display beneath PDF417 barcode |
+
+**Example**
+```js
+const seView = new Presence.SecureEntryView();
+seView.setPDF417Subtitle('A custom subtitle');
+```
+<a name="SecureEntryView+setQRCodeSubtitle"></a>
+
+### secureEntryView.setQRCodeSubtitle(subtitle)
+Creates a custom subtitle for the QR code variant of the SafeTix ticket.
+Will truncate if longer than the barcode.
+
+Note: If set to a falsy value, the barcode subtitle will be hidden.
+
+**Kind**: instance method of [<code>SecureEntryView</code>](#SecureEntryView)
+**Access**: public
+
+| Param | Type | Description |
+| --- | --- | --- |
+| subtitle | <code>String</code> | The text to display beneath QR barcode |
+
+**Example**
+```js
+const seView = new Presence.SecureEntryView();
+seView.setQRCodeSubtitle('A custom subtitle');
 ```
 <a name="SecureEntryView+teardown"></a>
 

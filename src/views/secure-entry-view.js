@@ -154,6 +154,55 @@ export class SecureEntryView {
     /**
      * @public
      * @description
+     * Allows branding color on subtitle text to be enabled.
+     *
+     * @param {Boolean} isEnabled - Whether or not subtitle should use branding color
+     * @example
+     * const seView = new Presence.SecureEntryView();
+     * seView.setBrandingColor('#076CD9');
+     * seView.enableBrandedSubtitle(true)
+     */
+    enableBrandedSubtitle(isEnabled) {
+        _renderer.get(this).isBrandingColoredSubtitleEnabled = !!isEnabled;
+    }
+
+    /**
+     * @public
+     * @description
+     * Creates a custom subtitle for the PDF417 variant of the SafeTix ticket.
+     * Will truncate if longer than the barcode.
+     *
+     * Note: If set to a falsy value, the barcode subtitle will be hidden.
+     *
+     * @param {String} subtitle - The text to display beneath PDF417 barcode
+     * @example
+     * const seView = new Presence.SecureEntryView();
+     * seView.setPDF417Subtitle('A custom subtitle');
+     */
+    setPDF417Subtitle(subtitle) {
+        _renderer.get(this).pdf417Subtitle = subtitle;
+    }
+
+    /**
+     * @public
+     * @description
+     * Creates a custom subtitle for the QR code variant of the SafeTix ticket.
+     * Will truncate if longer than the barcode.
+     *
+     * Note: If set to a falsy value, the barcode subtitle will be hidden.
+     *
+     * @param {String} subtitle - The text to display beneath QR barcode
+     * @example
+     * const seView = new Presence.SecureEntryView();
+     * seView.setQRCodeSubtitle('A custom subtitle');
+     */
+    setQRCodeSubtitle(subtitle) {
+        _renderer.get(this).qrCodeSubtitle = subtitle;
+    }
+
+    /**
+     * @public
+     * @description
      * Performs clean steps so that the SecureEntryView can be safely removed from DOM tree.
      *
      * @example

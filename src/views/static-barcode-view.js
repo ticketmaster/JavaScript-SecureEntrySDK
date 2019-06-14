@@ -1,25 +1,50 @@
 import * as QRCode from 'qrcode';
 import { TokenViewBase } from './token-views';
-import { createElement } from '../helpers/utils';
+import { createElement, applyStyle } from '../helpers/utils';
+
+const DEFAULT_SUBTITLE_COLOR = '#515151';
 
 /**
  * A class representing a renderable barcode.
  */
 export class StaticBarcodeView extends TokenViewBase {
     constructor(options = {}) {
-        super(Object.assign({ idPrefix: 'psebarcodeview' }, options));
+        super({ idPrefix: 'psebarcodeview', ...options });
 
-        this._canvasEl = createElement(
-            'canvas',
-            { id: `${options.idPrefix}-canvas-${options.id}` },
+        // TODO: Do full CSS reset on `TokenView`.
+        applyStyle(
+            this.el,
             {
+                fontSize: '0px',
+                lineHeight: '0px',
                 backgroundColor: '#fff',
-                boxSizing: 'border-box',
                 borderRadius: '4px'
             }
         );
 
+        this._canvasEl = createElement(
+            'canvas',
+            { id: this.generateElementId('canvas') },
+            { boxSizing: 'border-box' }
+        );
         this.el.appendChild(this._canvasEl);
+
+        this._subtitleEl = createElement(
+            'p',
+            { id: this.generateElementId('subtitle') },
+            {
+                textAlign: 'center',
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                color: options.useBrandingColorForSubtitle ? options.color : DEFAULT_SUBTITLE_COLOR
+            }
+        );
+        this.subtitle = options.subtitle;
+
+        // Cache container size for resizing later.
+        this.w = options.w;
+        this.h = options.h;
 
         this.setSize({
             containerWidth: options.w,
@@ -28,14 +53,53 @@ export class StaticBarcodeView extends TokenViewBase {
     }
 
     setSize({ containerWidth, containerHeight }) {
-        const barcodeSize = containerHeight;
-        const horizontalMargin = (containerWidth - barcodeSize) * 0.5;
+        const padding = 12; // Padding matches minimum readable text size
+        const doublePadding = padding * 2;
+        const barcodeContainerWidth = containerHeight;
 
-        this._setContainerSize(barcodeSize, barcodeSize, `0px ${horizontalMargin}px`);
-        this._setCanvasSize(this._canvasEl, barcodeSize, barcodeSize);
+        let canvasSize = barcodeContainerWidth;
+        let canvasSideMargin = 0;
+        let containerSideMargin = (containerWidth - canvasSize) * 0.5;
+
+        if (this.subtitle) {
+            canvasSize -= doublePadding;
+            canvasSideMargin = padding;
+
+            applyStyle(
+                this._subtitleEl,
+                {
+                    margin: '0px',
+                    padding: '0px',
+                    width: `${barcodeContainerWidth}px`,
+                    height: `${doublePadding}px`,
+                    fontSize: `${padding}px`,
+                    lineHeight: `${padding}px`
+                }
+            );
+        }
+
+        this._setContainerSize(barcodeContainerWidth, containerHeight, `0px ${containerSideMargin}px`);
+        this._setCanvasSize(this._canvasEl, canvasSize, canvasSize, `0px ${canvasSideMargin}px`, `${padding}px`);
+    }
+
+    get subtitle() {
+        return this._subtitle;
+    }
+
+    // Currently this should be called before `render`
+    set subtitle(subtitle) {
+        this._subtitle = subtitle;
+        if (subtitle && typeof subtitle === 'string') {
+            this._subtitleEl.innerText = subtitle;
+            this.el.appendChild(this._subtitleEl);
+        } else {
+            this._subtitleEl.remove();
+        }
     }
 
     render(data) {
-        QRCode.toCanvas(this._canvasEl, data, { width: this._canvasEl.width });
+        // Resize container to hanlde potentially added subtitle.
+        this.setSize({ containerWidth: this.w, containerHeight: this.h });
+        QRCode.toCanvas(this._canvasEl, data, { margin: 0, width: this._canvasEl.width });
     }
 }

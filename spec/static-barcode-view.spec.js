@@ -53,4 +53,50 @@ describe('static-barcode-view', () => {
             );
         });
     });
+
+    describe('barcode subtitle', () => {
+        const subtitle = 'subtitle';
+        const subtitleSelector = 'p[id*=subtitle]';
+
+        it('should not render subtitle when not provided in constructor', () => {
+            const view = new StaticBarcodeView();
+            expect(view.el.querySelector(`subtitle`)).to.not.exist;
+        });
+
+        it('should not render subtitle when property set to nil', () => {
+            const view = new StaticBarcodeView();
+
+            expect(view.el.querySelector(subtitleSelector)).to.not.exist;
+
+            view.subtitle = subtitle;
+
+            const subtitleEl = view.el.querySelector(subtitleSelector);
+            expect(subtitleEl).to.exist;
+            expect(subtitleEl.innerHTML).to.equal(subtitle);
+
+            view.subtitle = null;
+            expect(view.el.querySelector(subtitleSelector)).to.not.exist;
+        });
+
+        it('should render subtitle when provided in constructor', () => {
+            const view = new StaticBarcodeView({ subtitle });
+
+            const subtitleEl = view.el.querySelector(subtitleSelector);
+            expect(subtitleEl).to.exist;
+            expect(subtitleEl.innerHTML).to.equal(subtitle);
+        });
+
+        it('should render subtitle when provided in property', () => {
+            const view = new StaticBarcodeView();
+
+            let subtitleEl = view.el.querySelector(subtitleSelector);
+            expect(subtitleEl).to.not.exist;
+
+            view.subtitle = subtitle;
+
+            subtitleEl = view.el.querySelector(subtitleSelector);
+            expect(subtitleEl).to.exist;
+            expect(subtitleEl.innerHTML).to.equal(subtitle);
+        });
+    });
 });

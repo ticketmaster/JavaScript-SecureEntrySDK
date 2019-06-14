@@ -8,16 +8,32 @@ import { createElement, applyStyle } from '../helpers/utils';
  */
 export class TokenViewBase {
     constructor(options = {}) {
+        this._idPrefix = options.idPrefix;
+        this._id = options.id;
+
         this._containerEl = createElement(
             'div',
-            { id: `${options.idPrefix}-div-${options.id}` },
+            { id: this.generateElementId('div') },
             {
                 position: 'absolute',
-                boxSizing: 'border-box'
+                boxSizing: 'border-box',
+                fontFamily: '-apple-system, BlinkMacSystemFont, "Roboto", "Fira Sans", "Helvetica Neue", sans-serif'
             }
         );
 
         this._color = options.color;
+    }
+
+    /**
+     * Returns a "scoped" ID suitable for use as an element ID.
+     *
+     * @param {String} baseName
+     * @param {String} delimiter
+     *
+     * @returns String
+     */
+    generateElementId(baseName, delimiter = '-') {
+        return [this._idPrefix, baseName, this._id].join(delimiter);
     }
 
     /**

@@ -16,6 +16,7 @@ const REFRESH_INTERVAL = 15;
 const HEX_COLOR_WITH_ALPHA_REGEX = /(#\w{6})\w{2}$/;
 const SHORTHAND_HEX_COLOR_WITH_ALPHA_REGEX = /(#\w{3})\w$/;
 const COLOR_FUNCTION_REGEX = /(\w+?)a?\((.+?)\)$/;
+const DEFAULT_BARCODE_SUBTITLE = 'Screenshots are not valid';
 
 /**
  * Render Modes
@@ -60,6 +61,30 @@ export class InternalRenderer {
         this._barcodeView = null;
         this._secureTokenView = null;
         this._brandingColor = DEFAULT_BRANDING_COLOR;
+
+        /**
+         * Whether or not subtitle text color should be set to `brandingColor`.
+         *
+         * @type Boolean
+         * @default false
+         */
+        this.isBrandingColoredSubtitleEnabled = false;
+
+        /**
+         * Text to display beneath the PDF417 variant of the barcode. If set
+         * to a falsy value, the text will be hidden.
+         *
+         * @type String
+         */
+        this.pdf417Subtitle = DEFAULT_BARCODE_SUBTITLE;
+
+        /**
+         * Text to display beneath the PDF417 variant of the barcode. If set
+         * to a falsy value, the text will be hidden.
+         *
+         * @type String
+         */
+        this.qrCodeSubtitle = DEFAULT_BARCODE_SUBTITLE;
 
         /** @type ToggleButton */
         this._toggleButton = null;
@@ -293,7 +318,8 @@ export class InternalRenderer {
             w: this._rootEl.clientWidth,
             h: this._rootEl.clientHeight,
             color: this.brandingColor || DEFAULT_BRANDING_COLOR,
-            errorText: this.parseErrorText
+            errorText: this.parseErrorText,
+            useBrandingColorForSubtitle: this.isBrandingColoredSubtitleEnabled
         };
 
         if (this.error) {
@@ -310,13 +336,18 @@ export class InternalRenderer {
         utils.applyStyle(this._barcodeView.el, { opacity: 0 });
 
         this._rootEl.appendChild(this._barcodeView.el);
-        this._barcodeView.render(this._entryData.barcode);
 
         // If we have RET, we'll enhance qr code view with secure token view
         if (displayType === DisplayType.ROTATING || displayType === DisplayType.STATIC_PDF) {
             // Setup SecureTokenView
-            this._secureTokenView = new SecureTokenView(viewOptions);
+            this._secureTokenView = new SecureTokenView({
+                subtitle: this.pdf417Subtitle,
+                ...viewOptions
+            });
             mainContentViewEl = this._secureTokenView.el;
+
+            this._barcodeView.subtitle = this.qrCodeSubtitle;
+
             this._secureTokenView.render(this._entryData.generateSignedToken());
 
             if (displayType === DisplayType.ROTATING) {
@@ -329,17 +360,21 @@ export class InternalRenderer {
             // Add toggle button
             this._toggleButton = new ToggleButton({
                 ...viewOptions,
-                onToggle: () => utils.swapElementStyles(this._secureTokenView.el, this._barcodeView.el, ['top', 'opacity'])
+                onToggle: () => utils.swapElementStyles(this._secureTokenView.el, this._barcodeView.el, ['opacity'])
             });
 
             // Reposition views as SecureTokenView should now be primary
             utils.applyStyle(this._secureTokenView.el, { top: '0px', opacity: 0 });
-            utils.applyStyle(this._barcodeView.el, { top: `${viewOptions.h}px`, opacity: 0 });
+            utils.applyStyle(this._barcodeView.el, { opacity: 0 });
             utils.applyStyle(this._toggleButton.el, { opacity: 0 });
 
             this._rootEl.appendChild(this._secureTokenView.el);
             this._rootEl.appendChild(this._toggleButton.el);
         }
+
+        // TODO: Currently `render` must be called _after_ we set any barcode
+        // subtitles for SafeTix display. This should be improved later.
+        this._barcodeView.render(this._entryData.barcode);
 
         // Now that we've rendered content, fade in the main content view.
         utils.swapElementStyles(this._loadingView.el, mainContentViewEl, ['opacity']);
