@@ -1,16 +1,16 @@
-const { TokenViewBase } = require('./token-views');
-const { container, error: errorDimensions } = require('./dimensions');
-const { createElement, applyStyle } = require('./utils');
-const alertIcon = require('./img/Alert-Filled-36.svg');
+import { TokenViewBase } from './token-views';
+import { container, error as errorDimensions } from '../helpers/dimensions';
+import { createElement, applyStyle } from '../helpers/utils';
+import alertIcon from '../assets/error-icon.svg';
 
-const DEFAULT_ERROR_TEXT = 'Reload ticket';
-const MAX_ERROR_TEXT_LENGTH = 60;
-const DEFAULT_ICON_URL = `data:image/svg+xml;base64,${global.btoa(alertIcon)}`;
+export const DEFAULT_ERROR_TEXT = 'Reload ticket';
+export const MAX_ERROR_TEXT_LENGTH = 60;
+export const DEFAULT_ICON_URL = `data:image/svg+xml;base64,${global.btoa(alertIcon)}`;
 
 /**
  * A class representing an invalid token.
  */
-class ErrorView extends TokenViewBase {
+export class ErrorView extends TokenViewBase {
     constructor(options = {}) {
         const defaults = {
             idPrefix: 'pseerrorview',
@@ -19,6 +19,11 @@ class ErrorView extends TokenViewBase {
         };
         const mergedOptions = { ...defaults, ...options };
         super(mergedOptions);
+
+        this.setSize({
+            containerWidth: options.w,
+            containerHeight: options.h
+        });
 
         this._errorMessage = isValidErrorText(mergedOptions.errorText) ? mergedOptions.errorText : DEFAULT_ERROR_TEXT;
         this._iconURL = isValidImageURL(mergedOptions.iconURL) ? mergedOptions.iconURL : DEFAULT_ICON_URL;
@@ -30,9 +35,6 @@ class ErrorView extends TokenViewBase {
         const errorWidth = Math.floor(containerWidth * (errorDimensions.minWidth / container.minWidth)) - boundsPadding * 2;
         const errorHeight = Math.floor(containerHeight * (errorDimensions.minHeight / container.minHeight)) - boundsPadding * 2;
         this._setContainerSize(errorWidth, errorHeight, '', `${boundsPadding}px`);
-
-        // TODO: Refactor TokenViewBase to not assume canvas rendering
-        this.el.querySelector('canvas').remove();
 
         applyStyle(this.el, {
             top: '50%',
@@ -93,10 +95,3 @@ const isValidErrorText = errorText => typeof errorText === 'string' && errorText
  * @param {Any} imageURL
  */
 const isValidImageURL = imageURL => typeof imageURL === 'string' && imageURL !== '';
-
-module.exports = {
-    ErrorView,
-    DEFAULT_ERROR_TEXT,
-    DEFAULT_ICON_URL,
-    MAX_ERROR_TEXT_LENGTH
-};

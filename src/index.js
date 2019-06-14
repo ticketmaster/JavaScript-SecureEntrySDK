@@ -1,5 +1,5 @@
-const SecureEntryView = require('./secure-entry-view');
-const { Logger } = require('./utils');
+import { SecureEntryView } from './views/secure-entry-view';
+import { Logger } from './helpers/utils';
 
 Logger.log(`Running in ${process.env.NODE_ENV} mode`);
 
@@ -9,4 +9,4 @@ Logger.log(`Running in ${process.env.NODE_ENV} mode`);
  * @public
  */
 
-module.exports = { SecureEntryView };
+export { SecureEntryView };

@@ -3,9 +3,9 @@
  *  @author   : Gin (gin.lance.inside@hotmail.com)
  */
 
-const { OTP } = require('./otp');
+import { OTP } from './otp';
 
-class HOTP extends OTP {
+export class HOTP extends OTP {
   /* ＊
      * Generate the OTP with the given count
      *
@@ -73,5 +73,3 @@ class HOTP extends OTP {
     return super.url_gen(issuer, 'hotp');
   }
 }
-
-module.exports = { HOTP };

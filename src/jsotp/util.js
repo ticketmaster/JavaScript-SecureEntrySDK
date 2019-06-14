@@ -3,9 +3,9 @@
  *  @author   : Gin (gin.lance.inside@hotmail.com)
  */
 
-const { Base32 } = require('./base32');
+import { Base32 } from './base32';
 
-class Util {
+export class Util {
   /* ＊
      * Util rjust number with 0
      *
@@ -168,5 +168,3 @@ class Util {
     return paddedByteStringArray.join('');
   }
 }
-
-module.exports = { Util };

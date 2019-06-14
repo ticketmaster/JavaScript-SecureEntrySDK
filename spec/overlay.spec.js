@@ -1,11 +1,11 @@
 const { testCSSValuesAsIntegers } = require('./helpers');
-const Overlay = require('../src/overlay');
-const { Dimensions } = require('../src/constants');
+const { OverlayView } = require('../src/views/overlay');
+const { Dimensions } = require('../src/helpers/constants');
 
 describe('overlay', () => {
     const overlayWidth = Dimensions.pdf417.WIDTH + Dimensions.pdf417.PADDING * 2;
     const overlayHeight = Dimensions.pdf417.HEIGHT + Dimensions.pdf417.PADDING * 2;
-    const overlay = new Overlay('blue', overlayWidth, overlayHeight, Dimensions.pdf417.PADDING);
+    const overlay = new OverlayView('blue', overlayWidth, overlayHeight, Dimensions.pdf417.PADDING);
 
     it('should size and place container element correctly', () => {
         const expectedCSSValues = {

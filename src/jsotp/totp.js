@@ -3,10 +3,10 @@
  *  @author   : Gin (gin.lance.inside@hotmail.com)
  */
 
-const { OTP } = require('./otp');
-const { Util } = require('./util');
+import { OTP } from './otp';
+import { Util } from './util';
 
-class TOTP extends OTP {
+export class TOTP extends OTP {
   /* ＊
      * @param {secret}
      * @type {String}
@@ -98,5 +98,3 @@ class TOTP extends OTP {
     return super.url_gen(issuer, 'totp');
   }
 }
-
-module.exports = { TOTP };

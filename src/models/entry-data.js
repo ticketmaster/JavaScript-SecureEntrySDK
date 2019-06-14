@@ -1,7 +1,7 @@
 // TODO: Move these dependencies to vendor
-const jsotp = require('./jsotp/jsotp');
-const nibbler = require('./jsotp/nibbler/nibbler');
-const { Util } = require('./jsotp/util');
+import * as jsotp from '../jsotp/jsotp';
+import * as nibbler from '../jsotp/nibbler/nibbler';
+import { Util } from '../jsotp/util';
 
 const TOKEN_DELIMITER = '::';
 const TOTP_INTERVAL = 15;
@@ -13,7 +13,7 @@ const RenderType = {
     UNKNOWN: 'UNKNOWN'
 };
 
-const DisplayType = {
+export const DisplayType = {
     INVALID: 'INVALID',
     STATIC_QR: 'STATIC_QR',
     STATIC_PDF: 'STATIC_PDF',
@@ -31,7 +31,7 @@ const _displayType = new WeakMap();
 /**
  * Class to sign token's supplied from Presence Delivery Service.
  */
-class TokenSigner {
+export class EntryData {
     constructor(encodedToken) {
         let json = { b: 'errorbarcode', rt: RenderType.UNKNOWN };
 
@@ -123,5 +123,3 @@ class TokenSigner {
         return this.barcode;
     }
 }
-
-module.exports = { TokenSigner, DisplayType };

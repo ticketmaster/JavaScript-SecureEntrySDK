@@ -5,10 +5,10 @@
  *  @Disc     : a node module to generate and verify one-time passwords
  */
 
-const { TOTP } = require('./totp');
-const { HOTP } = require('./hotp');
-const { Base32 } = require('./base32');
-const { Util } = require('./util');
+import { TOTP } from './totp';
+import { HOTP } from './hotp';
+import { Base32 } from './base32';
+import { Util } from './util';
 
 /* ＊
  * Generate and return HOTP object
@@ -43,9 +43,9 @@ function totp_gen(secret, interval = 30) {
   return totp;
 }
 
-module.exports = {
-  HOTP: hotp_gen,
-  TOTP: totp_gen,
+export {
+  hotp_gen as HOTP,
+  totp_gen as TOTP,
   Base32,
-  Util
+  Util,
 };

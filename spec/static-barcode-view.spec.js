@@ -1,6 +1,6 @@
 const { expect } = require('chai');
 const { testCSSValuesAsIntegers } = require('./helpers');
-const { StaticBarcodeView } = require('../src/static-barcode-view');
+const { StaticBarcodeView } = require('../src/views/static-barcode-view');
 
 const ID_PREFIX = 'psebarcodeview-';
 

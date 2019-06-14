@@ -1,5 +1,5 @@
 const expect = require('chai').expect;
-const { TokenSigner, DisplayType } = require('../src/token');
+const { EntryData, DisplayType } = require('../src/models/entry-data');
 const { objectToEncodedToken } = require('./helpers');
 
 const ERROR_BARCODE = 'errorbarcode';
@@ -29,20 +29,20 @@ const tokenToTokenSignerPropertyMap = {
     ek: 'eventKey'
 };
 
-describe('TokenSigner', () => {
+describe('EntryData', () => {
     it('should decode and parse a static barcode token', () => {
-        const tokenSigner = new TokenSigner(encodedStaticBarcodeToken);
-        expectMappedPropertiesToEqual(decodedStaticBarcodeToken, tokenSigner);
+        const entryData = new EntryData(encodedStaticBarcodeToken);
+        expectMappedPropertiesToEqual(decodedStaticBarcodeToken, entryData);
     });
 
     it('should decode and parse a rotating entry token', () => {
-        const tokenSigner = new TokenSigner(encodedRotatingEntryToken);
-        expectMappedPropertiesToEqual(decodedRotatingEntryToken, tokenSigner);
+        const entryData = new EntryData(encodedRotatingEntryToken);
+        expectMappedPropertiesToEqual(decodedRotatingEntryToken, entryData);
     });
 
     it('should decode and parse a rotating entry token with event key', () => {
-        let tokenSigner = new TokenSigner(encodedRETWithEventKey);
-        expectMappedPropertiesToEqual(decodedRETWithEventKey, tokenSigner);
+        let entryData = new EntryData(encodedRETWithEventKey);
+        expectMappedPropertiesToEqual(decodedRETWithEventKey, entryData);
     });
 
     it('should handle valid raw barcode', () => {
@@ -66,9 +66,9 @@ describe('TokenSigner', () => {
         ];
 
         validBarcodes.forEach(barcode => {
-            const tokenSigner = new TokenSigner(barcode);
-            expect(tokenSigner.displayType).to.equal(DisplayType.STATIC_QR);
-            expectMappedPropertiesToEqual({ b: barcode }, tokenSigner);
+            const entryData = new EntryData(barcode);
+            expect(entryData.displayType).to.equal(DisplayType.STATIC_QR);
+            expectMappedPropertiesToEqual({ b: barcode }, entryData);
         });
     });
 
@@ -94,26 +94,26 @@ describe('TokenSigner', () => {
         ];
 
         invalidBarcodes.forEach(barcode => {
-            const tokenSigner = new TokenSigner(barcode);
-            expect(tokenSigner.displayType).to.equal(DisplayType.INVALID);
-            expectMappedPropertiesToEqual({ b: 'errorbarcode' }, tokenSigner);
+            const entryData = new EntryData(barcode);
+            expect(entryData.displayType).to.equal(DisplayType.INVALID);
+            expectMappedPropertiesToEqual({ b: 'errorbarcode' }, entryData);
         });
     });
 
     it('should be immutable', () => {
-        const tokenSigner = new TokenSigner(encodedRotatingEntryToken);
+        const entryData = new EntryData(encodedRotatingEntryToken);
 
         Object.keys(tokenToTokenSignerPropertyMap).forEach(key => {
-            const tokenSignerProperty = tokenToTokenSignerPropertyMap[key];
-            expect(tokenSigner[tokenSignerProperty]).to.equal(decodedRotatingEntryToken[key]);
+            const entryDataProperty = tokenToTokenSignerPropertyMap[key];
+            expect(entryData[entryDataProperty]).to.equal(decodedRotatingEntryToken[key]);
 
-            tokenSigner[tokenSignerProperty] = `new-${tokenSignerProperty}-value`;
-            expect(tokenSigner[tokenSignerProperty], `topic [${tokenSignerProperty}]`).to.equal(decodedRotatingEntryToken[key]);
+            entryData[entryDataProperty] = `new-${entryDataProperty}-value`;
+            expect(entryData[entryDataProperty], `topic [${entryDataProperty}]`).to.equal(decodedRotatingEntryToken[key]);
         });
 
-        const originalDisplayType = tokenSigner.displayType;
-        tokenSigner.displayType = 'new-segment-type';
-        expect(tokenSigner.displayType).to.equal(originalDisplayType);
+        const originalDisplayType = entryData.displayType;
+        entryData.displayType = 'new-segment-type';
+        expect(entryData.displayType).to.equal(originalDisplayType);
     });
 
     it('should create an "errorbarcode" when provided invalid token strings', () => {
@@ -123,39 +123,39 @@ describe('TokenSigner', () => {
         ];
 
         invalidTokenStrings.forEach(tokenString => {
-            const tokenSigner = new TokenSigner(tokenString);
-            expect(tokenSigner.barcode).to.equal(ERROR_BARCODE);
-            expect(tokenSigner.displayType).to.equal(DisplayType.INVALID);
+            const entryData = new EntryData(tokenString);
+            expect(entryData.barcode).to.equal(ERROR_BARCODE);
+            expect(entryData.displayType).to.equal(DisplayType.INVALID);
         });
     });
 
     it('should not throw error with unknown keys in provided token', () => {
-        let tokenSigner;
+        let entryData;
         let err;
         try {
-            tokenSigner = new TokenSigner(objectToEncodedToken({ uknownKey: 'unknownKey' }));
+            entryData = new EntryData(objectToEncodedToken({ uknownKey: 'unknownKey' }));
         } catch (e) {
             err = e;
         }
-        expect(tokenSigner).to.exist;
+        expect(entryData).to.exist;
         expect(err).to.not.exist;
     });
 
     describe('generateSignedToken', () => {
         it('should return a barcode for BARCODE segment type', () => {
-            let tokenSigner = new TokenSigner(encodedStaticBarcodeToken);
-            expect(tokenSigner.generateSignedToken()).to.equal(decodedStaticBarcodeToken.b);
+            let entryData = new EntryData(encodedStaticBarcodeToken);
+            expect(entryData.generateSignedToken()).to.equal(decodedStaticBarcodeToken.b);
         });
 
         it('should return a barcode for UKNOWN segment type', () => {
-            let tokenSigner = new TokenSigner(btoa('{invalidjson'));
-            expect(tokenSigner.generateSignedToken()).to.equal(ERROR_BARCODE);
+            let entryData = new EntryData(btoa('{invalidjson'));
+            expect(entryData.generateSignedToken()).to.equal(ERROR_BARCODE);
         });
 
         it('should return a signed token for ROTATING_SYMBOLOGY segment type', () => {
-            let tokenSigner = new TokenSigner(encodedRotatingEntryToken);
+            let entryData = new EntryData(encodedRotatingEntryToken);
 
-            const signedToken = tokenSigner.generateSignedToken();
+            const signedToken = entryData.generateSignedToken();
 
             const [, originalToken, totp] = signedToken.match(RegExp(`(${decodedRotatingEntryToken.t})::(.+)`)) || [];
             expect(originalToken, 'token').to.exist;
@@ -164,9 +164,9 @@ describe('TokenSigner', () => {
         });
 
         it('should return a signed token for ROTATING_SYMBOLOGY segment type with event key', () => {
-            let tokenSigner = new TokenSigner(objectToEncodedToken(decodedRETWithEventKey));
+            let entryData = new EntryData(objectToEncodedToken(decodedRETWithEventKey));
 
-            const signedToken = tokenSigner.generateSignedToken(1548364791161);
+            const signedToken = entryData.generateSignedToken(1548364791161);
 
             const [, originalToken, ektotp, cktotp] = signedToken.match(/(.+?)::([0-9]{6})::([0-9]{6})/) || [];
 
@@ -182,9 +182,9 @@ describe('TokenSigner', () => {
                 ck: '3d27b77eb8bf1d227b54fda89783843aabe248e5'
             };
 
-            let tokenSigner = new TokenSigner(objectToEncodedToken(token));
+            let entryData = new EntryData(objectToEncodedToken(token));
 
-            const signedToken = tokenSigner.generateSignedToken(1548364791161, false);
+            const signedToken = entryData.generateSignedToken(1548364791161, false);
             const [, , totp] = signedToken.match(RegExp(`(TM::.+::.+)::(.+)`)) || [];
             expect(totp).to.equal('376211');
         });
@@ -196,9 +196,9 @@ describe('TokenSigner', () => {
                 ck: '3d27b77eb8bf1d227b54fda89783843aabe248e5'
             };
 
-            let tokenSigner = new TokenSigner(objectToEncodedToken(token));
+            let entryData = new EntryData(objectToEncodedToken(token));
 
-            const signedToken = tokenSigner.generateSignedToken(1548364791161, true);
+            const signedToken = entryData.generateSignedToken(1548364791161, true);
             const [, , totp] = signedToken.match(RegExp(`(TM::.+::.+)::(.+)`)) || [];
             expect(totp).to.equal('269251');
         });

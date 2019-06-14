@@ -1,4 +1,4 @@
-var { bcdiv, bcmul, bcadd } = require('./bcmath-min');
+import { bcdiv, bcmul, bcadd } from './bcmath-min';
 
 /**
  * PDF417 - 2D Barcode generator (LGPLv3)
@@ -438,8 +438,8 @@ var PDF417 = {
             return false;
         }
         // get the input sequence array
-        sequence = this.getInputSequences(code);
-        codewords = []; // array of code-words
+        var sequence = this.getInputSequences(code);
+        var codewords = []; // array of code-words
         for(var i=0;i<sequence.length; i++) {
             var cw = this.getCompaction(sequence[i][0], sequence[i][1], true);
             codewords = codewords.concat(cw);
@@ -1271,4 +1271,4 @@ var PDF417 = {
 
 };
 
-module.exports = PDF417;
+export { PDF417 };

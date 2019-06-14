@@ -1,4 +1,4 @@
-const anime = require('animejs');
+import * as anime from 'animejs';
 
 // Uses `webpack-auto-inject-version` package to inject version string
 const LOG_PREFIX = 'Ticketmaster Presence SDK v[AIV]{version}[/AIV]: ';
@@ -13,7 +13,7 @@ const LOG_PREFIX = 'Ticketmaster Presence SDK v[AIV]{version}[/AIV]: ';
  *
  * @returns HTMLElement
  */
-const createElement = (element, elementAttributes = {}, cssAttributes = {}, children = []) => {
+export const createElement = (element, elementAttributes = {}, cssAttributes = {}, children = []) => {
     const el = document.createElement(element);
 
     // TODO: Perhaps use Object.entries
@@ -31,17 +31,17 @@ const createElement = (element, elementAttributes = {}, cssAttributes = {}, chil
  * @param {HTMLElement} element
  * @param {Object} cssAttributes
  */
-const applyStyle = (element, cssAttributes) => {
+export const applyStyle = (element, cssAttributes) => {
     cssAttributes && Object.keys(cssAttributes).forEach(function (attr) { this[attr] = cssAttributes[attr]; }, element.style);
 };
 
 // TODO: Document
-function getRandomIdentifier() {
+export function getRandomIdentifier() {
     return Math.round(Math.random() * 1e10);
 }
 
 // TODO: Document
-class Logger {
+export class Logger {
     static log(msg) {
         console.log(`${LOG_PREFIX}${msg}`);
     }
@@ -68,7 +68,7 @@ class Logger {
  * @param {String} [easing] - Easing function to use when animated. Defaults to 'easeOutBack'
  * @param {Number} [duration] - Duration of animation in milliseconds. Defaults to 300.
  */
-const swapElementStyles = (el1, el2, cssProperties, complete, easing = 'easeOutBack', duration = 300) => {
+export const swapElementStyles = (el1, el2, cssProperties, complete, easing = 'easeOutBack', duration = 300) => {
     const timeline = anime.timeline({ easing, duration, complete });
 
     let el1Anim = { targets: el1, offset: 0 };
@@ -82,12 +82,4 @@ const swapElementStyles = (el1, el2, cssProperties, complete, easing = 'easeOutB
 
     timeline.add({ ...el1Anim });
     timeline.add({ ...el2Anim });
-};
-
-module.exports = {
-    getRandomIdentifier,
-    Logger,
-    createElement,
-    applyStyle,
-    swapElementStyles
 };

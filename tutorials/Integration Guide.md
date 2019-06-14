@@ -1,5 +1,5 @@
 ## Secure Entry for JavaScript
-v1.0.1+
+v1.0.2+
 
 ## Introduction
 
@@ -48,16 +48,17 @@ QR code fallback:
 **Access**: public
 
 * [SecureEntryView](#SecureEntryView)
-    * [new SecureEntryView([options])](#new_SecureEntryView_new)
+    * [new exports.SecureEntryView([options])](#new_SecureEntryView_new)
     * [.setSelector(sel)](#SecureEntryView+setSelector)
     * [.setToken(token, [parseErrorText])](#SecureEntryView+setToken)
     * [.setBrandingColor(color)](#SecureEntryView+setBrandingColor)
     * [.setErrorText(errorText)](#SecureEntryView+setErrorText)
     * [.showError(error)](#SecureEntryView+showError)
+    * [.teardown()](#SecureEntryView+teardown)
 
 <a name="new_SecureEntryView_new"></a>
 
-### new SecureEntryView([options])
+### new exports.SecureEntryView([options])
 Class for rendering secure entry tokens in PDF417 format.
 
 A token will be rendered immediately after the instance is "renderable".
@@ -69,7 +70,7 @@ a token or an error is set with `showError`.
 | Param | Type | Description |
 | --- | --- | --- |
 | [options] | <code>Object</code> | Configuration options for the renderer. |
-| [options.selector] | <code>String</code> | A selector for the HTML container element the token will render in. |
+| [options.selector] | <code>String</code> \| <code>Node</code> | A selector or DOM node for the HTML container element the token will render in. |
 | [options.token] | <code>String</code> | A secure token retrieved from the Presence Delivery API. |
 | [options.error] | <code>Object</code> | An error object. |
 | [options.brandingColor] | <code>String</code> | A CSS hex color value. |
@@ -79,6 +80,11 @@ a token or an error is set with `showError`.
 ```js
 const seView = new Presence.SecureEntryView({
     selector: '#token-container',
+    token: '1234567890'
+});
+
+const seView = new Presence.SecureEntryView({
+    selector: aDOMNode,
     token: '1234567890'
 });
 ```
@@ -95,12 +101,15 @@ If a valid token is already set, the token will be rendered immediately.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| sel | <code>String</code> | A selector for the HTML container element the token will render in. |
+| sel | <code>String</code> \| <code>Node</code> | A selector or DOM node for the HTML container element the token will render in. |
 
 **Example**
 ```js
 const seView = new Presence.SecureEntryView();
 seView.setSelector('#token-container');
+
+const seView = new Presence.SecureEntryView();
+seView.setSelector(aDOMNode);
 ```
 <a name="SecureEntryView+setToken"></a>
 
@@ -194,4 +203,18 @@ seView.showError({
     text: 'Ticket not found'
     iconURL: 'https://your-cdn.com/36x32-error.png'
 });
+```
+<a name="SecureEntryView+teardown"></a>
+
+### secureEntryView.teardown()
+Performs clean steps so that the SecureEntryView can be safely removed from DOM tree.
+
+**Kind**: instance method of [<code>SecureEntryView</code>](#SecureEntryView)
+**Access**: public
+**Example**
+```js
+const seView = new Presence.SecureEntryView();
+
+// Sometime later prior to removing the container element or SecureEntryView from DOM tree.
+seView.teardown();
 ```

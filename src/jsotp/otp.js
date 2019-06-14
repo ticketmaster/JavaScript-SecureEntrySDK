@@ -2,13 +2,12 @@
  *  @module   : OTP module to generate the password
  *  @author   : Gin (gin.lance.inside@hotmail.com)
  */
-const jsSHA = require('jssha');
+import jsSHA from 'jssha';
 
-const { Base32 } = require('./base32');
-const { Util } = require('./util');
-const { zeroPad } = require('../utils');
+import { Base32 } from './base32';
+import { Util } from './util';
 
-class OTP {
+export class OTP {
   /* ＊
      * This constructor will create OTP instance.
      *
@@ -103,4 +102,3 @@ class OTP {
   }
 }
 
-module.exports = { OTP };

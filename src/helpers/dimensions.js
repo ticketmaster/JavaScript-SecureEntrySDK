@@ -60,8 +60,6 @@ function generateSizing(size, addPaddingPercentage = false) {
     return sizing;
 };
 
-module.exports = {
-    container: generateSizing(containerMinSize),
-    pdf417: generateSizing(pdf417MinSize, true),
-    error: generateSizing(errorMinSize, true)
-};
+export const container = generateSizing(containerMinSize);
+export const pdf417 = generateSizing(pdf417MinSize, true);
+export const error = generateSizing(errorMinSize, true);

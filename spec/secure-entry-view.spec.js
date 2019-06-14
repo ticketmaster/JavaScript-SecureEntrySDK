@@ -1,8 +1,8 @@
 const expect = require('chai').expect;
 const { testObjectAPI } = require('./helpers');
-const SecureEntryView = require('../src/secure-entry-view');
-const { InternalRenderer, RenderModes } = require('../src/internal-renderer');
-const { getRandomIdentifier } = require('../src/utils');
+const { SecureEntryView } = require('../src/views/secure-entry-view');
+const { RenderModes } = require('../src/controllers/internal-renderer');
+const { getRandomIdentifier } = require('../src/helpers/utils');
 
 describe('SecureEntryView', () => {
     it('should be instantiated with `new`', () => {
@@ -29,34 +29,10 @@ describe('SecureEntryView', () => {
                 'setSelector',
                 'setBrandingColor',
                 'setErrorText',
-                'showError'
+                'showError',
+                'teardown'
             ]
         });
-    });
-
-    it('should be passthrough for `InternalRenderer`', () => {
-        const mockRender = new InternalRenderer();
-
-        const options = {
-            selector: 'selector',
-            token: 'token',
-            brandingColor: 'brandingColor'
-        };
-
-        const view = new SecureEntryView(options, mockRender);
-        expect(view).to.exist;
-        expect(mockRender.selector).to.equal(options.selector);
-        expect(mockRender.token).to.equal(options.token);
-        expect(mockRender.brandingColor).to.equal(options.brandingColor);
-
-        view.setSelector('newselector');
-        expect(mockRender.selector).to.equal('newselector');
-
-        view.setToken('newtoken');
-        expect(mockRender.token).to.equal('newtoken');
-
-        view.setBrandingColor('color');
-        expect(mockRender.brandingColor).to.equal('color');
     });
 
     describe('rendering behavior', () => {
@@ -75,6 +51,25 @@ describe('SecureEntryView', () => {
 
         afterEach(() => {
             container.remove();
+        });
+
+        it('should immediately render with container node in setter', () => {
+            const containerNode = document.createElement('div');
+            view = new SecureEntryView();
+            view.setSelector(containerNode);
+            view.setToken(token);
+
+            const el = containerNode.querySelector('div[id*=pseview]');
+            expect(el).to.exist;
+        });
+
+        it('should immediately render with container node in constructor', () => {
+            const containerNode = document.createElement('div');
+            view = new SecureEntryView({ selector: containerNode });
+            view.setToken(token);
+
+            const el = containerNode.querySelector('div[id*=pseview]');
+            expect(el).to.exist;
         });
 
         it('should immediately render with no options object in constructor', () => {

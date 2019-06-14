@@ -4,8 +4,8 @@
  * @module barcode
  */
 
-const PDF417 = require('./vendor/pdf417');
-const { createElement } = require('./utils');
+import { PDF417 } from '../vendor/pdf417';
+import { createElement } from './utils';
 
 const BLOCK_WIDTH = 2;
 const BLOCK_SIZE_RATIO = 1;
@@ -36,7 +36,7 @@ const BLOCK_SIZE_RATIO = 1;
  *
  * @return {BarcodeMatrix}
  */
-function createBarcodeMatrix(barcodeString) {
+export function createBarcodeMatrix(barcodeString) {
     PDF417.init(barcodeString);
     const barcodeMatrix = PDF417.getBarcodeArray();
 
@@ -60,7 +60,7 @@ function createBarcodeMatrix(barcodeString) {
  *
  * @return {CanvasDimensions}
  */
-function getCanvasDimsForBarcode(barcodeMatrix, containerWidth, blockWidth = BLOCK_WIDTH, ratio = BLOCK_SIZE_RATIO) {
+export function getCanvasDimsForBarcode(barcodeMatrix, containerWidth, blockWidth = BLOCK_WIDTH, ratio = BLOCK_SIZE_RATIO) {
     const blockHeight = blockWidth * ratio;
     const barcodeWidth = blockWidth * barcodeMatrix.columnLength;
     const barcodeHeight = blockHeight * barcodeMatrix.rowLength;
@@ -82,7 +82,7 @@ function getCanvasDimsForBarcode(barcodeMatrix, containerWidth, blockWidth = BLO
  * @param {Number} blockWidth
  * @param {Number} ratio
  */
-function drawBarcodeInCanvas(ctx1, barcodeString, blockWidth = BLOCK_WIDTH, ratio = BLOCK_SIZE_RATIO) {
+export function drawBarcodeInCanvas(ctx1, barcodeString, blockWidth = BLOCK_WIDTH, ratio = BLOCK_SIZE_RATIO) {
     const barcodeArray = createBarcodeMatrix(barcodeString);
 
     // Offscreen rendering
@@ -120,9 +120,3 @@ function drawBarcodeInCanvas(ctx1, barcodeString, blockWidth = BLOCK_WIDTH, rati
     };
     img.src = offscreenCanvas.toDataURL();
 }
-
-module.exports = {
-    createBarcodeMatrix,
-    getCanvasDimsForBarcode,
-    drawBarcodeInCanvas
-};

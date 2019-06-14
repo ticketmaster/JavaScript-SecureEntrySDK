@@ -1,5 +1,5 @@
 const { expect } = require('chai');
-const { ErrorView, DEFAULT_ERROR_TEXT, DEFAULT_ICON_URL, MAX_ERROR_TEXT_LENGTH } = require('../src/error-view');
+const { ErrorView, DEFAULT_ERROR_TEXT, DEFAULT_ICON_URL, MAX_ERROR_TEXT_LENGTH } = require('../src/views/error-view');
 
 describe('error-view', () => {
     describe('ErrorView', () => {

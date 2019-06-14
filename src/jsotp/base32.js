@@ -4,9 +4,9 @@
  *  @author   : Gin (gin.lance.inside@hotmail.com)
  */
 
-const nibbler = require('./nibbler/nibbler');
+import nibbler from './nibbler/nibbler';
 
-class Base32 {
+export class Base32 {
   /* ＊
      * Base32 decode function
      *
@@ -36,5 +36,3 @@ class Base32 {
     return random_str.substring(0, length);
   }
 }
-
-module.exports = { Base32 };

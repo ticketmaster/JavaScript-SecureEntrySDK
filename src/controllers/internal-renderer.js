@@ -2,17 +2,20 @@
  * @module
  */
 
-const utils = require('./utils');
-const { TokenSigner, DisplayType } = require('./token');
-const { ErrorView } = require('./error-view');
-const { StaticBarcodeView } = require('./static-barcode-view');
-const { SecureTokenView } = require('./secure-token-view');
-const { ToggleButton } = require('./toggle-button');
-const { LoadingView } = require('./loading-view');
-const { container: containerDimensions } = require('./dimensions');
+import * as utils from '../helpers/utils';
+import { EntryData, DisplayType } from '../models/entry-data';
+import { ErrorView } from '../views/error-view';
+import { StaticBarcodeView } from '../views/static-barcode-view';
+import { SecureTokenView } from '../views/secure-token-view';
+import { ToggleButton } from '../views/toggle-button';
+import { LoadingView } from '../views/loading-view';
+import { container as containerDimensions } from '../helpers/dimensions';
 
 const DEFAULT_BRANDING_COLOR = '#076CD9';
 const REFRESH_INTERVAL = 15;
+const HEX_COLOR_WITH_ALPHA_REGEX = /(#\w{6})\w{2}$/;
+const SHORTHAND_HEX_COLOR_WITH_ALPHA_REGEX = /(#\w{3})\w$/;
+const COLOR_FUNCTION_REGEX = /(\w+?)a?\((.+?)\)$/;
 
 /**
  * Render Modes
@@ -20,7 +23,7 @@ const REFRESH_INTERVAL = 15;
  * @readonly
  * @enum {String}
  */
-const RenderModes = {
+export const RenderModes = {
     /** Should render immediately after all rendering criteria is met. */
     IMMEDIATE: 'immediate',
     /** Should only render explicitly. */
@@ -33,7 +36,7 @@ const _mode = new WeakMap();
 
 /**
  * @typedef InternalRendererConfiguration
- * @property {String} [selector] - A `DOMString` containing a selector to match.
+ * @property {Node} [containerNode] - A DOM node that will be rendered into.
  * @property {String} [token] - A valid token.
  * @property {Object} [error] - An error object.
  * @property {String} [brandingColor] - A color.
@@ -47,21 +50,22 @@ const _mode = new WeakMap();
  *
  * @param {InternalRendererConfiguration} [options] - Renderer configuration.
  */
-class InternalRenderer {
+export class InternalRenderer {
     constructor(options = {}) {
         _id.set(this, utils.getRandomIdentifier());
         _mode.set(this, options.renderMode || RenderModes.DEFERRED);
 
-        this._viewContainer = utils.createElement('div', { id: `pseview-${_id.get(this)}` });
+        this._rootEl = utils.createElement('div', { id: `pseview-${_id.get(this)}` });
         this._loadingView = null;
         this._barcodeView = null;
         this._secureTokenView = null;
+        this._brandingColor = DEFAULT_BRANDING_COLOR;
 
         /** @type ToggleButton */
         this._toggleButton = null;
 
-        /** @type TokenSigner */
-        this._tokenSigner = null;
+        /** @type EntryData */
+        this._entryData = null;
 
         this.setConfiguration(options);
     }
@@ -74,14 +78,14 @@ class InternalRenderer {
     setConfiguration(options = {}) {
         // We must access private members directly to avoid accidently
         // triggering multiple renders with the accessors.
-        this._selector = options.selector;
+        this._containerNode = options.containerNode;
         this.updateBarcodeContainerSize();
 
         this._token = options.token;
-        this._tokenSigner = new TokenSigner(this._token);
+        this._entryData = new EntryData(this._token);
         this.parseErrorText = options.parseErrorText || options.errorText;
 
-        this.brandingColor = options.brandingColor || DEFAULT_BRANDING_COLOR;
+        this.brandingColor = options.brandingColor || this.brandingColor;
 
         (_mode.get(this) === RenderModes.IMMEDIATE && this.isRenderable) && this.render();
     }
@@ -110,29 +114,27 @@ class InternalRenderer {
             _mode.set(this, newMode);
         }
     }
-
     /**
-     * The CSS selector this renderer should render to.
+     * The node this renderer should render to.
      *
      * If `token` is set and `mode` is `RenderModes.IMMEDIATE`, will
      * automatically render.
      *
      * @type {String}
      */
-    get selector() {
-        return this._selector;
+    get containerNode() {
+        return this._containerNode;
     }
 
-    set selector(sel) {
-        let oldSel;
-        [this._selector, oldSel] = [sel, this._selector];
+    set containerNode(node) {
+        this._containerNode = node;
 
         // TODO: Always attempt to reattach to the integrator node.
         // TODO: Resize all child views in the event we are attached to a new element of a different size.
 
         this.updateBarcodeContainerSize();
 
-        if (this.mode === RenderModes.IMMEDIATE && !oldSel) {
+        if (this.mode === RenderModes.IMMEDIATE) {
             this.render();
         }
     }
@@ -140,7 +142,7 @@ class InternalRenderer {
     /**
      * The token the renderer should render.
      *
-     * If `selector` is set and `mode` is `RenderModes.IMMEDIATE`, will
+     * If `containerNode` is set and `mode` is `RenderModes.IMMEDIATE`, will
      * automatically render.
      *
      * @type {String}
@@ -154,7 +156,7 @@ class InternalRenderer {
         [this._token, oldToken] = [token, this._token];
 
         // This seems problematic if we want to support null to clear renderer state
-        this._tokenSigner = new TokenSigner(this._token);
+        this._entryData = new EntryData(this._token);
 
         if (this.mode === RenderModes.IMMEDIATE && !oldToken) {
             this.render();
@@ -164,7 +166,7 @@ class InternalRenderer {
     /**
      * The error the renderer should render.
      *
-     * If `selector` is set and `mode` is `RenderModes.IMMEDIATE`, will
+     * If `containerNode` is set and `mode` is `RenderModes.IMMEDIATE`, will
      * automatically render.
      *
      * @type {Object}
@@ -181,6 +183,51 @@ class InternalRenderer {
         }
     }
 
+    get brandingColor() {
+        return this._brandingColor;
+    }
+
+    set brandingColor(color) {
+        if (color === 'transparent') {
+            return;
+        }
+
+        let regexResult;
+        let newColor = color;
+
+        // Strip alpha channel from full and shorthand hex color notation.
+        regexResult = color.match(HEX_COLOR_WITH_ALPHA_REGEX);
+        if (regexResult) {
+            newColor = regexResult[1];
+        }
+        regexResult = color.match(SHORTHAND_HEX_COLOR_WITH_ALPHA_REGEX);
+        if (regexResult) {
+            newColor = regexResult[1];
+        }
+
+        // Strip alpha channel from functional color notation.
+        regexResult = color.match(COLOR_FUNCTION_REGEX);
+        if (regexResult) {
+            let colorFunctionParameters = regexResult[2]
+                // Normalize parameter delimiters to spaces.
+                .replace(/[/,]/g, ' ').split(/\s+/)
+                // CSS color functions we're supporting have alpha channel as
+                // optional 4th parameter, so we only want parameters up to there.
+                .slice(0, 3);
+            newColor = `${regexResult[1]}(${colorFunctionParameters.join()})`;
+        }
+
+        this._brandingColor = newColor;
+    }
+
+    /**
+     * Performs clean up steps allowing safe removal from DOM tree.
+     */
+    teardown() {
+        // TODO: Look into a MutationObserver to automatically cleanup.
+        clearInterval(this._tokenRefreshIntervalID);
+    }
+
     // TODO: Prefix internal methods with '_'.
     /**
      * Whether or not the renderer is currently renderable.
@@ -189,19 +236,18 @@ class InternalRenderer {
      * @type {Boolean}
      */
     get isRenderable() {
-        return !!(this.selector && (this.token || this.error));
+        return !!(this._containerNode && (this.token || this.error));
     }
 
     // TODO: Prefix internal methods with '_'.
     updateBarcodeContainerSize() {
-        const integratorContainer = document.querySelector(this.selector);
-        if (integratorContainer) {
-            (this.mode === RenderModes.IMMEDIATE) && integratorContainer.appendChild(this._viewContainer);
+        if (this._containerNode) {
+            (this.mode === RenderModes.IMMEDIATE) && this._containerNode.appendChild(this._rootEl);
 
-            const width = Math.max(integratorContainer.clientWidth, containerDimensions.minWidth);
+            const width = Math.max(this._containerNode.clientWidth, containerDimensions.minWidth);
             const height = Math.ceil(width * containerDimensions.ratio);
 
-            utils.applyStyle(this._viewContainer, {
+            utils.applyStyle(this._rootEl, {
                 width: `${width}px`,
                 height: `${height}px`,
                 display: 'inline-block',
@@ -214,11 +260,11 @@ class InternalRenderer {
             if (!this._loadingView) {
                 this._loadingView = new LoadingView({
                     id: _id.get(this),
-                    w: this._viewContainer.clientWidth,
-                    h: this._viewContainer.clientHeight
+                    w: this._rootEl.clientWidth,
+                    h: this._rootEl.clientHeight
                 });
                 utils.applyStyle(this._loadingView.el, { opacity: 1 });
-                this._viewContainer.appendChild(this._loadingView.el);
+                this._rootEl.appendChild(this._loadingView.el);
             }
         }
     }
@@ -233,20 +279,19 @@ class InternalRenderer {
             return;
         }
 
-        utils.Logger.log(`'render' called with selector '${this.selector}' and barcode '${this.token}'`);
+        utils.Logger.log(`'render' called on '${`pseview-${_id.get(this)}`}' with token '${this.token}'`);
 
-        const integratorContainer = document.querySelector(this.selector);
-        if (!integratorContainer) {
-            utils.Logger.error(`No element found for selector '${this.selector}'`);
+        if (!this._containerNode) {
+            utils.Logger.error(`'render' called on '${`pseview-${_id.get(this)}`}' with no container`);
             return;
         }
 
-        integratorContainer.appendChild(this._viewContainer);
+        this._containerNode.appendChild(this._rootEl);
 
         const viewOptions = {
             id: _id.get(this),
-            w: this._viewContainer.clientWidth,
-            h: this._viewContainer.clientHeight,
+            w: this._rootEl.clientWidth,
+            h: this._rootEl.clientHeight,
             color: this.brandingColor || DEFAULT_BRANDING_COLOR,
             errorText: this.parseErrorText
         };
@@ -256,7 +301,7 @@ class InternalRenderer {
             viewOptions.iconURL = this.error.iconURL;
         }
 
-        const displayType = this._tokenSigner.displayType;
+        const displayType = this._entryData.displayType;
 
         // We always render at least a QR code or error state.
         let BarcodeViewClass = (displayType === DisplayType.INVALID) ? ErrorView : StaticBarcodeView;
@@ -264,19 +309,20 @@ class InternalRenderer {
         let mainContentViewEl = this._barcodeView.el;
         utils.applyStyle(this._barcodeView.el, { opacity: 0 });
 
-        this._viewContainer.appendChild(this._barcodeView.el);
-        this._barcodeView.render(this._tokenSigner.barcode);
+        this._rootEl.appendChild(this._barcodeView.el);
+        this._barcodeView.render(this._entryData.barcode);
 
         // If we have RET, we'll enhance qr code view with secure token view
         if (displayType === DisplayType.ROTATING || displayType === DisplayType.STATIC_PDF) {
             // Setup SecureTokenView
             this._secureTokenView = new SecureTokenView(viewOptions);
             mainContentViewEl = this._secureTokenView.el;
-            this._secureTokenView.render(this._tokenSigner.generateSignedToken());
+            this._secureTokenView.render(this._entryData.generateSignedToken());
 
             if (displayType === DisplayType.ROTATING) {
-                setInterval(() => {
-                    this._secureTokenView.render(this._tokenSigner.generateSignedToken());
+                this._tokenRefreshIntervalID = setInterval(() => {
+                    utils.Logger.log(`pseview-${_id.get(this)} refreshed token at ${new Date()}`);
+                    this._secureTokenView.render(this._entryData.generateSignedToken());
                 }, REFRESH_INTERVAL * 1000);
             }
 
@@ -291,8 +337,8 @@ class InternalRenderer {
             utils.applyStyle(this._barcodeView.el, { top: `${viewOptions.h}px`, opacity: 0 });
             utils.applyStyle(this._toggleButton.el, { opacity: 0 });
 
-            this._viewContainer.appendChild(this._secureTokenView.el);
-            this._viewContainer.appendChild(this._toggleButton.el);
+            this._rootEl.appendChild(this._secureTokenView.el);
+            this._rootEl.appendChild(this._toggleButton.el);
         }
 
         // Now that we've rendered content, fade in the main content view.
@@ -302,8 +348,3 @@ class InternalRenderer {
         }
     }
 }
-
-module.exports = {
-    InternalRenderer,
-    RenderModes
-};

@@ -1,6 +1,6 @@
 {
   "name": "presence-se-sdk",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Ticketmaster JavaScript SDK for rendering secure barcodes",
   "main": "src/index.js",
   "scripts": {

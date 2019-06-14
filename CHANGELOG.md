@@ -3,6 +3,22 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [1.0.2] - 2019-04-24
+### Improved
+- Branding color handling.
+- Scanline animation uses a different easing function to match Android and iOS implementations.
+
+### Added
+- Ability to supply a DOM Node in addition to a CSS selector when configuring a `SecureEntryView`.
+- `SecureEntryView.teardown` as a means of forcing clean up prior to removing the `SecureEntryView`
+  from the DOM.
+
+### Internal project changes
+- Move to ES6 modules.
+- Restructure project source.
+- Renamed `TokenSigner` to `EntryData` to start matching native SDKs' nomenclature.
+- Misc refactoring.
+
 ## [1.0.1] - 2019-03-22
 ### Added
 - Optional parameter to `setToken` allowing customization of token parsing errors.

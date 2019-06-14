@@ -1,12 +1,12 @@
-const anime = require('animejs');
-const { createElement } = require('./utils');
+import anime from 'animejs';
+import { createElement } from '../helpers/utils';
 
 // We use WeakMaps to mimic private access modifier.
 const _container = new WeakMap();
 const _color = new WeakMap();
 const _timeline = new WeakMap();
 
-class OverlayView {
+export class OverlayView {
     constructor(color, width, height, padding) {
         const sharedCSS = {
             position: 'absolute',
@@ -96,7 +96,7 @@ class OverlayView {
  * @param {Number} width
  */
 function createAnimationTimeline(primaryOverlay, secondaryOverlay, width) {
-    const easing = 'easeOutQuint';
+    const easing = [0.42, 0, 0.58, 1.0];
     const duration = 1.5 * 1000;
     const offset = `-=${duration - 100}`;
 
@@ -131,5 +131,3 @@ function createAnimationTimeline(primaryOverlay, secondaryOverlay, width) {
 
     return timeline;
 }
-
-module.exports = OverlayView;

@@ -1,7 +1,9 @@
-const { InternalRenderer, RenderModes } = require('./internal-renderer');
+import { InternalRenderer, RenderModes } from './../controllers/internal-renderer';
 
 // We use WeakMaps to mimic private access modifier.
 const _renderer = new WeakMap();
+
+const getNode = selOrNode => (selOrNode instanceof global.Node) ? selOrNode : document.querySelector(selOrNode);
 
 /**
  * @public
@@ -15,7 +17,7 @@ const _renderer = new WeakMap();
  * a token or an error is set with `showError`.
  *
  * @param {Object} [options] - Configuration options for the renderer.
- * @param {String} [options.selector] - A selector for the HTML container element the token will render in.
+ * @param {String|Node} [options.selector] - A selector or DOM node for the HTML container element the token will render in.
  * @param {String} [options.token] - A secure token retrieved from the Presence Delivery API.
  * @param {Object} [options.error] - An error object.
  * @param {String} [options.brandingColor] - A CSS hex color value.
@@ -26,9 +28,17 @@ const _renderer = new WeakMap();
  *     selector: '#token-container',
  *     token: '1234567890'
  * });
+ *
+ * const seView = new Presence.SecureEntryView({
+ *     selector: aDOMNode,
+ *     token: '1234567890'
+ * });
  */
-class SecureEntryView {
+export class SecureEntryView {
     constructor(options, _diRenderer) {
+        if (options && options.selector) {
+            options.containerNode = getNode(options.selector);
+        }
         if (_diRenderer instanceof InternalRenderer) {
             _renderer.set(this, _diRenderer);
             _renderer.get(this).setConfiguration(options);
@@ -45,13 +55,16 @@ class SecureEntryView {
      *
      * If a valid token is already set, the token will be rendered immediately.
      *
-     * @param {String} sel - A selector for the HTML container element the token will render in.
+     * @param {String|Node} sel - A selector or DOM node for the HTML container element the token will render in.
      * @example
      * const seView = new Presence.SecureEntryView();
      * seView.setSelector('#token-container');
+     *
+     * const seView = new Presence.SecureEntryView();
+     * seView.setSelector(aDOMNode);
      */
     setSelector(sel) {
-        _renderer.get(this).selector = sel;
+        _renderer.get(this).containerNode = getNode(sel);
     }
 
     /**
@@ -137,6 +150,19 @@ class SecureEntryView {
     showError(error) {
         _renderer.get(this).error = error;
     }
-}
 
-module.exports = SecureEntryView;
+    /**
+     * @public
+     * @description
+     * Performs clean steps so that the SecureEntryView can be safely removed from DOM tree.
+     *
+     * @example
+     * const seView = new Presence.SecureEntryView();
+     *
+     * // Sometime later prior to removing the container element or SecureEntryView from DOM tree.
+     * seView.teardown();
+     */
+    teardown() {
+        _renderer.get((this)).teardown();
+    }
+}

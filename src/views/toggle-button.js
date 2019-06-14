@@ -1,7 +1,7 @@
-const { container: containerDimensions } = require('./dimensions');
-const { createElement, swapElementStyles } = require('./utils');
-const onStateSVGDataString = require('./img/Icon-Overflow.svg');
-const offStateSVGDataString = require('./img/Icon-Swap.svg');
+import { container as containerDimensions } from '../helpers/dimensions';
+import { createElement, swapElementStyles } from '../helpers/utils';
+import onStateSVGDataString from '../assets/switch-to-qr-icon.svg';
+import offStateSVGDataString from '../assets/switch-to-pdf417-icon.svg';
 
 const BUTTON_MIN_SIZE = 24;
 const OFF_STATE_TIMEOUT = 10;
@@ -14,7 +14,7 @@ const OFF_STATE_TIMEOUT = 10;
  * @param {Number} optinos.w - Width of the container, button will be rendered in.
  * @param {Function} options.onToggle - Callback when button state is toggled.
  */
-class ToggleButton {
+export class ToggleButton {
     constructor({ w, onToggle }) {
         const stateToggleButtonSize = w * (BUTTON_MIN_SIZE / containerDimensions.minWidth);
         const svgDataStrings = [onStateSVGDataString, offStateSVGDataString];
@@ -119,5 +119,3 @@ class ToggleButton {
         });
     };
 }
-
-module.exports = { ToggleButton };

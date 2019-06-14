@@ -1,4 +1,4 @@
-const { createElement, applyStyle } = require('./utils');
+import { createElement, applyStyle } from '../helpers/utils';
 
 // TODO: Document
 /**
@@ -6,34 +6,18 @@ const { createElement, applyStyle } = require('./utils');
  * @param {String} options.idPrefix
  * @param {String} options.id
  */
-class TokenViewBase {
+export class TokenViewBase {
     constructor(options = {}) {
-        this._canvasEl = createElement(
-            'canvas',
-            { id: `${options.idPrefix}-canvas-${options.id}` },
-            {
-                backgroundColor: '#fff',
-                boxSizing: 'border-box',
-                borderRadius: '4px'
-            }
-        );
-
         this._containerEl = createElement(
             'div',
             { id: `${options.idPrefix}-div-${options.id}` },
             {
                 position: 'absolute',
                 boxSizing: 'border-box'
-            },
-            [this._canvasEl]
+            }
         );
 
         this._color = options.color;
-
-        this.setSize({
-            containerWidth: options.w,
-            containerHeight: options.h
-        });
     }
 
     /**
@@ -88,11 +72,9 @@ class TokenViewBase {
      * @param {Number} height - Canvas element height
      * @param {String} margin - CSS text value for the canvas margin value
      */
-    _setCanvasSize(width, height, margin = '0px', padding = '0px') {
-        this._canvasEl.width = width;
-        this._canvasEl.height = height;
-        applyStyle(this._canvasEl, { margin, padding });
+    _setCanvasSize(canvas, width, height, margin = '0px', padding = '0px') {
+        canvas.width = width;
+        canvas.height = height;
+        applyStyle(canvas, { margin, padding });
     }
 }
-
-module.exports = { TokenViewBase };

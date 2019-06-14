@@ -1,7 +1,7 @@
 const { expect } = require('chai');
 const { testCSSValuesAsIntegers } = require('./helpers');
-const { SecureTokenView } = require('../src/secure-token-view');
-const { pdf417 } = require('../src/dimensions');
+const { SecureTokenView } = require('../src/views/secure-token-view');
+const { pdf417 } = require('../src/helpers/dimensions');
 
 const ID_PREFIX = 'psetokenview-';
 
