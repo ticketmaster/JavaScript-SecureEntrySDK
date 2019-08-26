@@ -1,6 +1,6 @@
 {
   "name": "presence-se-sdk",
-  "version": "1.0.3",
+  "version": "1.0.5",
   "description": "Ticketmaster JavaScript SDK for rendering secure barcodes",
   "main": "src/index.js",
   "scripts": {
@@ -53,6 +53,7 @@
     "karma-safari-launcher": "^1.0.0",
     "karma-webpack": "^3.0.5",
     "mocha": "^5.2.0",
+    "sinon": "^7.3.2",
     "svg-inline-loader": "^0.8.0",
     "webpack": "^4.21.0",
     "webpack-auto-inject-version": "^1.2.2",

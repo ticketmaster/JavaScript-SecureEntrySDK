@@ -3,6 +3,9 @@ const { InternalRenderer, RenderModes } = require('../src/controllers/internal-r
 const { objectToEncodedToken } = require('./helpers');
 const { container: containerDimensions, pdf417 } = require('../src/helpers/dimensions');
 
+const timeSync = require('../src/helpers/time-sync');
+timeSync.syncTime(0);
+
 const tokenSecureToken = objectToEncodedToken({ b: 'b', t: 't', ck: 'ck' });
 const barcodeSecureToken = objectToEncodedToken({ b: 'b' });
 const DEFAULT_BRANDING_COLOR = '#076CD9';

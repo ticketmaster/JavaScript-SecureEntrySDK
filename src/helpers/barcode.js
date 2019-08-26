@@ -85,12 +85,14 @@ export function getCanvasDimsForBarcode(barcodeMatrix, containerWidth, blockWidt
 export function drawBarcodeInCanvas(ctx1, barcodeString, blockWidth = BLOCK_WIDTH, ratio = BLOCK_SIZE_RATIO) {
     const barcodeArray = createBarcodeMatrix(barcodeString);
 
+    const dpr = global.devicePixelRadius || 1;
+
     // Offscreen rendering
     const offscreenCanvas = createElement(
         'canvas',
         {
-            width: blockWidth * barcodeArray.columnLength,
-            height: blockWidth * barcodeArray.rowLength
+            width: blockWidth * barcodeArray.columnLength * dpr,
+            height: blockWidth * barcodeArray.rowLength * dpr
         }
     );
     const ctx = offscreenCanvas.getContext('2d');

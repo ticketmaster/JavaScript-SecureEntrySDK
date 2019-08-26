@@ -71,7 +71,12 @@ export class SecureTokenView extends TokenViewBase {
         const margin = `${Math.floor((containerHeight - barcodeContainerHeight - doublePadding) * 0.5)}px auto`;
 
         this._setContainerSize(barcodeContainerWidth, barcodeContainerHeight, margin);
-        this._setCanvasSize(this._canvasEl, canvasWidth, canvasHeight, '0px', `${padding}px`);
+
+        // Render canvas at appropriate native pixel resolution, but use CSS to display correct
+        // logical pixel resolution.
+        const dpr = global.devicePixelRatio || 1;
+        this._setCanvasSize(this._canvasEl, canvasWidth * dpr, canvasHeight * dpr, '0px', `${padding}px`);
+        applyStyle(this._canvasEl, { width: `${canvasWidth + doublePadding}px`, height: `${canvasHeight + doublePadding}px` });
 
         // TODO: Dont' recreate
         const overlay = new OverlayView(

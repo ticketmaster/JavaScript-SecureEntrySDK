@@ -168,11 +168,12 @@ describe('EntryData', () => {
 
             const signedToken = entryData.generateSignedToken(1548364791161);
 
-            const [, originalToken, ektotp, cktotp] = signedToken.match(/(.+?)::([0-9]{6})::([0-9]{6})/) || [];
+            const [, originalToken, ektotp, cktotp, timestamp] = signedToken.match(/(.+?)::([0-9]{6})::([0-9]{6})::([0-9]+)/) || [];
 
             expect(originalToken, 'token').to.equal(decodedRETWithEventKey.t);
             expect(ektotp, 'ektotp').to.equal('958774');
             expect(cktotp, 'cktotp').to.equal('269251');
+            expect(timestamp, 'timestamp').to.equal('1548364791');
         });
 
         it('should generate proper TOTP without padding', () => {

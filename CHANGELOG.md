@@ -3,6 +3,20 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [1.0.5] - 2019-07-17
+- Update time server resource URL.
+
+## [1.0.4] - 2019-07-15
+### Added
+- Timestamp used to generate TOTP is now embedded in rendered PDF417 barcode.
+- Server and integrator time sync support. `SecureEntryView` will now perform server check for
+  current time to compare with device time. This can (and should) be done prior to rendering with
+  the `Presence.init` function as early as possible.
+
+## Fixed
+- PDF417 now renders at proper device resolution, resulting in sharper barcodes and improved scan
+  success rate.
+
 ## [1.0.3] - 2019-06-14
 ### Changed
 - Changed PDF417 and QR code toggle trigger and animation. The touch area is now the entire

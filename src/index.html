@@ -370,6 +370,7 @@
         // The html-webpack-plugin adds script tag at end of body, so we try to
         // wait to render.
         document.addEventListener('DOMContentLoaded', () => {
+            Presence.init();
             document.querySelectorAll('[data-token]').forEach(token => {
                 token.id = 'seview-container-' + Math.round(Math.random() * 1e10);
 

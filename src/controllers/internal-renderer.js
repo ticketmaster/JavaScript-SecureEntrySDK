@@ -10,6 +10,7 @@ import { SecureTokenView } from '../views/secure-token-view';
 import { ToggleButton } from '../views/toggle-button';
 import { LoadingView } from '../views/loading-view';
 import { container as containerDimensions } from '../helpers/dimensions';
+import * as timeSync from '../helpers/time-sync';
 
 const DEFAULT_BRANDING_COLOR = '#076CD9';
 const REFRESH_INTERVAL = 15;
@@ -328,32 +329,60 @@ export class InternalRenderer {
         }
 
         const displayType = this._entryData.displayType;
+        switch (displayType) {
+            case DisplayType.STATIC_QR:
+                this.setupSimpleView(StaticBarcodeView, viewOptions);
+                break;
 
-        // We always render at least a QR code or error state.
-        let BarcodeViewClass = (displayType === DisplayType.INVALID) ? ErrorView : StaticBarcodeView;
+            case DisplayType.ROTATING: case DisplayType.STATIC_PDF:
+                this.setupSafeTixView(viewOptions);
+                break;
+
+            default:
+                this.setupSimpleView(ErrorView, viewOptions);
+        }
+    }
+
+    /**
+     * Setup the provided BarcodeViewClass
+     *
+     * @param {Object} BarcodeViewClass - The class to create and render.
+     * @param {Object} viewOptions - The view options used in class creation.
+     * @param {Boolean} displayImmediately - Whether or not the class should immediately be visible.
+     */
+    setupSimpleView(BarcodeViewClass, viewOptions, displayImmediately = true) {
         this._barcodeView = new BarcodeViewClass(viewOptions);
-        let mainContentViewEl = this._barcodeView.el;
         utils.applyStyle(this._barcodeView.el, { opacity: 0 });
-
+        this._barcodeView.render(this._entryData.barcode);
         this._rootEl.appendChild(this._barcodeView.el);
 
-        // If we have RET, we'll enhance qr code view with secure token view
-        if (displayType === DisplayType.ROTATING || displayType === DisplayType.STATIC_PDF) {
-            // Setup SecureTokenView
-            this._secureTokenView = new SecureTokenView({
-                subtitle: this.pdf417Subtitle,
-                ...viewOptions
-            });
-            mainContentViewEl = this._secureTokenView.el;
+        if (displayImmediately) {
+            utils.swapElementStyles(this._loadingView.el, this._barcodeView.el, ['opacity']);
+        }
+    }
 
-            this._barcodeView.subtitle = this.qrCodeSubtitle;
+    /**
+     * Setup the SafeTix view.
+     *
+     * @param {Object} viewOptions - The view options used in class creation.
+     */
+    setupSafeTixView(viewOptions) {
+        this.setupSimpleView(StaticBarcodeView, { subtitle: this.qrCodeSubtitle, ...viewOptions }, false);
 
-            this._secureTokenView.render(this._entryData.generateSignedToken());
+        this._secureTokenView = new SecureTokenView({
+            subtitle: this.pdf417Subtitle,
+            ...viewOptions
+        });
 
-            if (displayType === DisplayType.ROTATING) {
+        timeSync.syncTime(null, timeDelta => {
+            const date = timeSync.dateFromTimeDelta(timeDelta);
+            this._secureTokenView.render(this._entryData.generateSignedToken(date));
+
+            if (this._entryData.displayType === DisplayType.ROTATING) {
                 this._tokenRefreshIntervalID = setInterval(() => {
-                    utils.Logger.log(`pseview-${_id.get(this)} refreshed token at ${new Date()}`);
-                    this._secureTokenView.render(this._entryData.generateSignedToken());
+                    utils.Logger.debug(`pseview-${_id.get(this)} refreshed token at ${new Date()}`);
+                    const date = timeSync.dateFromTimeDelta(timeSync.getCachedTimeDelta());
+                    this._secureTokenView.render(this._entryData.generateSignedToken(date));
                 }, REFRESH_INTERVAL * 1000);
             }
 
@@ -370,16 +399,8 @@ export class InternalRenderer {
 
             this._rootEl.appendChild(this._secureTokenView.el);
             this._rootEl.appendChild(this._toggleButton.el);
-        }
 
-        // TODO: Currently `render` must be called _after_ we set any barcode
-        // subtitles for SafeTix display. This should be improved later.
-        this._barcodeView.render(this._entryData.barcode);
-
-        // Now that we've rendered content, fade in the main content view.
-        utils.swapElementStyles(this._loadingView.el, mainContentViewEl, ['opacity']);
-        if (displayType === DisplayType.ROTATING || displayType === DisplayType.STATIC_PDF) {
-            utils.swapElementStyles(this._loadingView.el, this._toggleButton.el, ['opacity']);
-        }
+            utils.swapElementStyles(this._loadingView.el, this._secureTokenView.el, ['opacity']);
+        });
     }
 }

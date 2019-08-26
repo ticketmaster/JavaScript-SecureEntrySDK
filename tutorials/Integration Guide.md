@@ -1,5 +1,5 @@
 ## Secure Entry for JavaScript
-v1.0.3+
+v1.0.4+
 
 ## Introduction
 
@@ -24,6 +24,8 @@ QR code fallback:
 <div id="token-container" style="width: 282px"></div>
 <script type="text/javascript" src="https://secure-entry.ticketmaster.com/presence-secure-entry.min.js"></script>
 <script type="text/javascript">
+    // Initialize the SDK.
+    Presence.init();
 
     // Set configuration during instantiation.
     const renderer = new Presence.SecureEntryView({
@@ -40,6 +42,28 @@ QR code fallback:
 ```
 
 ## API
+
+<a name="init"></a>
+
+## init([options])
+Initialize the SDK.
+
+**Kind**: global function
+**Access**: public
+
+| Param | Type | Description |
+| --- | --- | --- |
+| [options] | <code>Object</code> |  |
+| [options.timeDelta] | <code>Number</code> | The time difference (in milliseconds) between a trusted server and the local device. |
+
+**Example**
+```js
+// Accept default time sync.
+Presence.init();
+
+// Provide your own trusted time delta of 3.5 minutes in milliseconds.
+Presence.init({ timeDelta: 210000 });
+```
 
 <a name="SecureEntryView"></a>
 

@@ -103,6 +103,13 @@ export class EntryData {
     generateSignedToken(time, withCounterPadding = true) {
         if (this.displayType === DisplayType.ROTATING) {
             const keys = [this.eventKey, this.customerKey];
+
+            let totpTime = time;
+            if (this.eventKey) {
+                let temp = new Date(totpTime);
+                totpTime = temp instanceof Date && `${temp}` !== 'Invalid Date' ? temp : new Date();
+            }
+
             const tokenComponents = keys.reduce((acc, key) => {
                 if (key) {
                     let encodedKey;
@@ -113,11 +120,17 @@ export class EntryData {
                     }
 
                     const totpGenerator = jsotp.TOTP(encodedKey, TOTP_INTERVAL);
-                    const totp = totpGenerator.now(time, withCounterPadding);
+                    const totp = totpGenerator.now(totpTime, withCounterPadding);
                     acc.push(totp);
                 }
                 return acc;
             }, [this.rawToken]);
+
+            if (this.eventKey) {
+                const totpTimeInSeconds = Math.floor(totpTime.getTime() / 1000);
+                tokenComponents.push(totpTimeInSeconds);
+            }
+
             return tokenComponents.join(TOKEN_DELIMITER);
         }
         return this.barcode;
