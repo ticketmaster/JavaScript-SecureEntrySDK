@@ -1,5 +1,5 @@
 ## Secure Entry for JavaScript
-v1.0.4+
+v1.0.7+
 
 ## Introduction
 
@@ -65,6 +65,20 @@ Presence.init();
 Presence.init({ timeDelta: 210000 });
 ```
 
+<a name="containerSizes"></a>
+
+## containerSizes : <code>enum</code>
+Known container sizes for rendering barcode containers.
+
+**Kind**: global enum
+**Access**: public
+**Properties**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| SIZE_216x160 | <code>String</code> | 216x160 |
+| SIZE_278x127 | <code>String</code> | 278x127 |
+
 <a name="SecureEntryView"></a>
 
 ## SecureEntryView
@@ -99,6 +113,7 @@ a token or an error is set with `showError`.
 | [options] | <code>Object</code> | Configuration options for the renderer. |
 | [options.selector] | <code>String</code> \| <code>Node</code> | A selector or DOM node for the HTML container element the token will render in. |
 | [options.token] | <code>String</code> | A secure token retrieved from the Presence Delivery API. |
+| [options.containerSize] | <code>String</code> | A known container size to use for rendering. Default is 216x160. See global `containerSizes` for supported values. |
 | [options.error] | <code>Object</code> | An error object. |
 | [options.brandingColor] | <code>String</code> | A CSS hex color value. |
 | [options.errorText] | <code>String</code> | Deprecated: Use optional parameter to `setToken` instead. |

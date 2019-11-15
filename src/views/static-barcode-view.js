@@ -2,7 +2,7 @@ import * as QRCode from 'qrcode';
 import { TokenViewBase } from './token-views';
 import { createElement, applyStyle } from '../helpers/utils';
 
-const DEFAULT_SUBTITLE_COLOR = '#515151';
+const DEFAULT_SUBTITLE_COLOR = '#262626';
 
 /**
  * A class representing a renderable barcode.

@@ -17,7 +17,7 @@ export class TokenViewBase {
             {
                 position: 'absolute',
                 boxSizing: 'border-box',
-                fontFamily: '-apple-system, BlinkMacSystemFont, "Roboto", "Fira Sans", "Helvetica Neue", sans-serif'
+                fontFamily: 'Averta-Semibold, -apple-system, BlinkMacSystemFont, "Roboto", "Fira Sans", "Helvetica Neue", sans-serif'
             }
         );
 

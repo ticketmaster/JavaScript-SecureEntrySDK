@@ -61,5 +61,18 @@ function generateSizing(size, addPaddingPercentage = false) {
 };
 
 export const container = generateSizing(containerMinSize);
+export const containerNew = generateSizing({ w: 278, h: 127 });
 export const pdf417 = generateSizing(pdf417MinSize, true);
 export const error = generateSizing(errorMinSize, true);
+
+/**
+ * Known container sizes for rendering barcode containers.
+ * @public
+ * @enum {String}
+ * @property {String} SIZE_216x160 - 216x160
+ * @property {String} SIZE_278x127 - 278x127
+ */
+export const containerSizes = {
+    SIZE_216x160: '216x160',
+    SIZE_278x127: '278x127'
+};

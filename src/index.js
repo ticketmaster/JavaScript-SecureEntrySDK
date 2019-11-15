@@ -1,6 +1,7 @@
 import { SecureEntryView } from './views/secure-entry-view';
 import { Logger } from './helpers/utils';
 import { syncTime } from './helpers/time-sync';
+import { containerSizes } from './helpers/dimensions';
 
 Logger.log(`Running in ${process.env.NODE_ENV} mode`);
 
@@ -28,4 +29,4 @@ const init = options => {
     syncTime((options && options.timeDelta) || null);
 };
 
-export { SecureEntryView, init };
+export { SecureEntryView, init, containerSizes };

@@ -3,8 +3,8 @@ const { OverlayView } = require('../src/views/overlay');
 const { Dimensions } = require('../src/helpers/constants');
 
 describe('overlay', () => {
-    const overlayWidth = Dimensions.pdf417.WIDTH + Dimensions.pdf417.PADDING * 2;
-    const overlayHeight = Dimensions.pdf417.HEIGHT + Dimensions.pdf417.PADDING * 2;
+    const overlayWidth = Dimensions.pdf417.WIDTH;
+    const overlayHeight = Dimensions.pdf417.HEIGHT;
     const overlay = new OverlayView('blue', overlayWidth, overlayHeight, Dimensions.pdf417.PADDING);
 
     it('should size and place container element correctly', () => {
@@ -21,7 +21,7 @@ describe('overlay', () => {
         const primaryOverlay = overlay.el.childNodes[0];
         const expectedCSSValues = {
             width: Dimensions.pdf417.PADDING * 0.5,
-            height: 100,
+            height: Dimensions.pdf417.HEIGHT - Dimensions.pdf417.PADDING,
             left: 2
         };
         testCSSValuesAsIntegers(primaryOverlay.style, expectedCSSValues);
@@ -29,7 +29,7 @@ describe('overlay', () => {
 
     it('should size and place secondary bar element correctly', () => {
         const secondaryOverlay = overlay.el.childNodes[1];
-        const expectedHeight = overlayHeight - Dimensions.pdf417.PADDING;
+        const expectedHeight = Dimensions.pdf417.HEIGHT - (Dimensions.pdf417.PADDING * 2);
         const expectedCSSValues = {
             width: Dimensions.pdf417.PADDING,
             height: expectedHeight,

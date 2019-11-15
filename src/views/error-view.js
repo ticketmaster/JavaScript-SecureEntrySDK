@@ -20,6 +20,7 @@ export class ErrorView extends TokenViewBase {
         const mergedOptions = { ...defaults, ...options };
         super(mergedOptions);
 
+        this._useNewSpec = options.useNewSpec;
         this.setSize({
             containerWidth: options.w,
             containerHeight: options.h
@@ -49,7 +50,7 @@ export class ErrorView extends TokenViewBase {
             // TODO: Consider moving to view container in the event we render text in other views.
             color: '#7A7A7A',
             fontSize: `${containerHeight * errorDimensions.fontPercentage}px`,
-            fontFamily: '-apple-system, BlinkMacSystemFont, "Roboto", "Fira Sans", "Helvetica Neue", sans-serif'
+            fontFamily: 'Averta, -apple-system, BlinkMacSystemFont, "Roboto", "Fira Sans", "Helvetica Neue", sans-serif'
         });
 
         this._icon = createElement('img',
@@ -73,6 +74,27 @@ export class ErrorView extends TokenViewBase {
                 textOverflow: 'ellipsis'
             }
         );
+
+        if (this._useNewSpec) {
+            applyStyle(this.el, {
+                flexDirection: 'row',
+                fontSize: '12px',
+                lineHeight: '16px'
+            });
+            applyStyle(this._icon, {
+                flex: '0 0 auto',
+                margin: 'auto',
+                marginRight: '7px'
+            });
+            applyStyle(txt, {
+                flex: '0 1 auto',
+                textAlign: 'left',
+                verticalAlign: 'middle',
+                margin: 'auto',
+                marginLeft: '7px'
+            });
+        }
+
         this.el.appendChild(txt);
         this._textEl = txt;
     }

@@ -4,7 +4,9 @@ import { OverlayView } from './overlay';
 import { pdf417 } from '../helpers/dimensions';
 import { createElement, applyStyle } from '../helpers/utils';
 
-const DEFAULT_SUBTITLE_COLOR = '#515151';
+const DEFAULT_SUBTITLE_COLOR = '#262626';
+const SUBTITLE_PADDING = 12;
+const SUBTITLE_FONT_SIZE = 14;
 
 // TODO: Better name that isn't so close to SecureEntryView
 /**
@@ -44,8 +46,6 @@ export class SecureTokenView extends TokenViewBase {
                 margin: '0px',
                 padding: '0px',
                 backgroundColor,
-                borderBottomLeftRadius: borderRadius,
-                borderBottomRightRadius: borderRadius,
                 textAlign: 'center',
                 whiteSpace: 'nowrap',
                 overflow: 'hidden',
@@ -63,53 +63,46 @@ export class SecureTokenView extends TokenViewBase {
 
     setSize({ containerWidth, containerHeight }) {
         const barcodeContainerWidth = containerWidth;
-        const padding = Math.floor((barcodeContainerWidth * pdf417.paddingPercentage) * 0.5);
-        const doublePadding = padding * 2;
-        const canvasWidth = barcodeContainerWidth - doublePadding;
-        const canvasHeight = canvasWidth * pdf417.ratio;
-        const barcodeContainerHeight = canvasHeight + doublePadding;
-        const margin = `${Math.floor((containerHeight - barcodeContainerHeight - doublePadding) * 0.5)}px auto`;
-
-        this._setContainerSize(barcodeContainerWidth, barcodeContainerHeight, margin);
+        const barcodeSafeArea = Math.floor((barcodeContainerWidth * pdf417.paddingPercentage) * 0.5);
+        const doubleBarcodeSafeArea = barcodeSafeArea * 2;
+        const barcodeWidth = barcodeContainerWidth - doubleBarcodeSafeArea;
+        const barcodeHeight = barcodeWidth * pdf417.ratio;
 
         // Render canvas at appropriate native pixel resolution, but use CSS to display correct
         // logical pixel resolution.
         const dpr = global.devicePixelRatio || 1;
-        this._setCanvasSize(this._canvasEl, canvasWidth * dpr, canvasHeight * dpr, '0px', `${padding}px`);
-        applyStyle(this._canvasEl, { width: `${canvasWidth + doublePadding}px`, height: `${canvasHeight + doublePadding}px` });
+        this._setCanvasSize(this._canvasEl, barcodeWidth * dpr, barcodeHeight * dpr, `${barcodeSafeArea}px`);
+        applyStyle(this._canvasEl, { width: `${barcodeWidth}px`, height: `${barcodeHeight}px` });
+
+        let subtitleHeight = 0;
+        if (this.subtitle) {
+            subtitleHeight = SUBTITLE_FONT_SIZE + (SUBTITLE_PADDING * 2);
+            applyStyle(
+                this._subtitleEl,
+                {
+                    width: `100%`,
+                    marginTop: `${SUBTITLE_PADDING - barcodeSafeArea * 0.5}px`,
+                    height: `${SUBTITLE_FONT_SIZE + 2}px`,
+                    fontSize: `${SUBTITLE_FONT_SIZE}px`,
+                    lineHeight: `${SUBTITLE_FONT_SIZE}px`
+                }
+            );
+        }
+
+        // The total container height must account for the optional subtitle.
+        const barcodeContainerHeight = barcodeHeight + doubleBarcodeSafeArea + subtitleHeight;
+        const barcodeContainerMargin = Math.floor((containerHeight - barcodeContainerHeight) * 0.5);
+        this._setContainerSize(barcodeContainerWidth, barcodeContainerHeight, `${barcodeContainerMargin}px auto`);
 
         // TODO: Dont' recreate
         const overlay = new OverlayView(
             this._color,
             barcodeContainerWidth,
-            barcodeContainerHeight,
-            padding
+            barcodeHeight + doubleBarcodeSafeArea,
+            barcodeSafeArea
         );
         this._containerEl.appendChild(overlay.el);
         overlay.playAnimation();
-
-        if (this.subtitle) {
-            const fontSize = 12;
-            applyStyle(
-                this._subtitleEl,
-                {
-                    width: `100%`,
-                    height: `${doublePadding}px`,
-                    fontSize: `${fontSize}px`,
-                    lineHeight: `${fontSize}px`
-                }
-            );
-
-            // Canvas bottom corner radius is not needed because of subtitle.
-            // Maybe wrap these in a container and set radius there?
-            applyStyle(
-                this.el,
-                {
-                    borderBottomLeftRadius: '0px',
-                    borderBottomRightRadius: '0px'
-                }
-            );
-        }
     }
 
     get subtitle() {

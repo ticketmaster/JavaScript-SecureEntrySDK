@@ -140,7 +140,7 @@ describe('SecureEntryView', () => {
     describe('barcode subtitle', () => {
         let view;
         let internalRenderer;
-        const expectedDefaultSubtitle = 'Screenshots are not valid';
+        const expectedDefaultSubtitle = `Screenshots won't get you in.`;
 
         beforeEach(() => {
             internalRenderer = new InternalRenderer();

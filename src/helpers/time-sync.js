@@ -3,10 +3,10 @@ import { Logger, getRandomIdentifier } from './utils';
 const SERVER_TIME_RESOURCE = 'https://app.ticketmaster.com/safetix/configuration/v1/config';
 
 let isRequestInProgress = false;
-const requestTimeout = 3000;
+const requestTimeout = 10000;
 const requestRetryTime = 500;
 
-const timeDeltaCacheTTL = 15 * 60 * 1000;
+const timeDeltaCacheTTL = 60 * 1000;
 
 export const storageKey = 'pse-td';
 

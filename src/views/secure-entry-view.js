@@ -19,6 +19,7 @@ const getNode = selOrNode => (selOrNode instanceof global.Node) ? selOrNode : do
  * @param {Object} [options] - Configuration options for the renderer.
  * @param {String|Node} [options.selector] - A selector or DOM node for the HTML container element the token will render in.
  * @param {String} [options.token] - A secure token retrieved from the Presence Delivery API.
+ * @param {String} [options.containerSize] - A known container size to use for rendering. Default is 216x160. See global `containerSizes` for supported values.
  * @param {Object} [options.error] - An error object.
  * @param {String} [options.brandingColor] - A CSS hex color value.
  * @param {String} [options.errorText] Deprecated: Use optional parameter to `setToken` instead.

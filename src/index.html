@@ -6,6 +6,14 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Integration Examples and Test Page</title>
     <style>
+        @font-face {
+            font-family: "Averta";
+            src: url("https://s1.s.tmol.io/static/font/averta/regular.woff");
+        }
+        @font-face {
+            font-family: "Averta-Semibold";
+            src: url("https://s1.s.tmol.io/static/font/averta/semibold.woff");
+        }
         body {
             color: #333333;
             font-family: Averta, "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -100,6 +108,12 @@
             background-color: #ebebeb;
             margin: 20px;
         }
+
+        .new-container {
+            width: 278px;
+            height: 127px;
+        }
+
         .ideal-container {
             width: 216px;
             height: 160px;
@@ -196,9 +210,10 @@
         // Default static barcode and secure entry token tokens.
         const DEFAULT_TOKENS = {
             ROTATING: encodeTokenObject({
-                b: '964537283001',
-                t: 'TM::03::201ytfnie7kiflsghgpt9d4x7bnu9chn3acpw7hr7d9fsss1s',
-                ck: '34d6d253bb3de2191ed930f62ad8d4d384eae5f5'
+                b: '0867346476041616a',
+                t: 'BAAAAAAAAAAAAAAAAAAAAAAAAACGkf5ldefwXHwZjoFc3rsDcDH6Jrcjj9m2KIb+',
+                ck: '3d27b77eb8bf1d227b54fda89783843aabe248e5',
+                ek: 'b06f0f6ff8750cb7875ab2604f2c48b41c79d83f'
             }),
             STATIC_PDF: encodeTokenObject({
                 b: '964537283001',
@@ -265,6 +280,10 @@
         (function () {
             let exampleGroups = [
                 {
+                    groupName: 'Min size (278 x 127)',
+                    className: 'new-container sev-raw'
+                },
+                {
                     groupName: 'Min size (216 x 160)',
                     className: 'ideal-container sev-raw'
                 },
@@ -300,8 +319,16 @@
                     dataset: { token: DEFAULT_TOKENS.RAW_BARCODE }
                 },
                 {
-                    name: 'Integrator provided error',
+                    name: 'Integrator provided error and icon 1',
                     dataset: { token: DEFAULT_TOKENS.NULL, errortext: 'Error 207 - Ticket not found', erroriconurl: ERROR_ICON_DATA_URI }
+                },
+                {
+                    name: 'Integrator provided error and icon 2',
+                    dataset: { token: DEFAULT_TOKENS.NULL, errortext: 'Lorem ipsum dolor sit amet, consectetur adipiscing volutpat.', erroriconurl: ERROR_ICON_DATA_URI }
+                },
+                {
+                    name: 'Integrator provided error and icon 3',
+                    dataset: { token: DEFAULT_TOKENS.NULL, errortext: 'Lorem ipsum dolor sit amet, consectetur adipiscing volutpat.', erroriconurl: 'data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMzYgMzIiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+PHRpdGxlPkljb25zL0ZlZWRiYWNrL0FsZXJ0L0FsZXJ0LUZpbGxlZC0zNjwvdGl0bGU+PGRlc2M+Q3JlYXRlZCB3aXRoIFNrZXRjaC48L2Rlc2M+PGcgaWQ9IkVycm9yLVN0YXRlcyIgc3Ryb2tlPSJub25lIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+PGcgaWQ9IkJhcmNvZGUtZXJyb3Itc3RhdGUtLS1leGFtcGxlLTEiIHRyYW5zZm9ybT0idHJhbnNsYXRlKC0xNzAuMDAwMDAwLCAtMzg0LjAwMDAwMCkiPjxnIGlkPSJFcnJvciIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoODcuMDAwMDAwLCAzNTMuMDAwMDAwKSI+PGcgaWQ9Ikljb25zL0ZlZWRiYWNrL0FsZXJ0L0FsZXJ0LUZpbGxlZC0zNiIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoODMuMDAwMDAwLCAyOS4wMDAwMDApIj48cGF0aCBkPSJNMS4xMDcxNjI1OSwzMS41MDM5NDA3IEwxNy4xMzE2MjAzLDMuNDU1MTY4ODMgQzE3LjQwNTU4NjMsMi45NzU2MjYyNSAxOC4wMTY0MjU3LDIuODA4OTczNTEgMTguNDk1OTY4MywzLjA4MjkzOTUgQzE4LjY1MTA2MTcsMy4xNzE1NDU0NiAxOC43Nzk1OTE2LDMuMzAwMDc1MzkgMTguODY4MTk3NiwzLjQ1NTE2ODgzIEwzNC44OTI2NTUzLDMxLjUwMzk0MDcgQzM1LjE2NjYyMTMsMzEuOTgzNDgzMyAzNC45OTk5Njg1LDMyLjU5NDMyMjYgMzQuNTIwNDI2LDMyLjg2ODI4ODYgQzM0LjM2OTM0NzMsMzIuOTU0NjAwOSAzNC4xOTgzNjI1LDMzIDM0LjAyNDM2NjcsMzMgTDEuOTc1NDUxMjMsMzMgQzEuNDIzMTY2NDgsMzMgMC45NzU0NTEyMjksMzIuNTUyMjg0NyAwLjk3NTQ1MTIyOSwzMiBDMC45NzU0NTEyMjksMzEuODI2MDA0MiAxLjAyMDg1MDMzLDMxLjY1NTAxOTMgMS4xMDcxNjI1OSwzMS41MDM5NDA3IFoiIGlkPSJhbGVydCIgc3Ryb2tlLW9wYWNpdHk9IjAuNjUiIHN0cm9rZT0iIzI2MjYyNiIgZmlsbD0iI0ZGRkZGRiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIj48L3BhdGg+PGVsbGlwc2UgaWQ9Ik92YWwtMiIgZmlsbC1vcGFjaXR5PSIwLjY1IiBmaWxsPSIjMjYyNjI2IiBjeD0iMTcuOTk5OTA4OSIgY3k9IjI4LjM0MDMwMSIgcng9IjEuNTY1OTUxOTUiIHJ5PSIxLjU1MzIzMjk5Ij48L2VsbGlwc2U+PHBhdGggZD0iTTE3Ljk5OTkwODksMjQuNzE2MDkwNyBMMTcuOTk5OTA4OSwyNC43MTYwOTA3IEMxOC44NjQ3NjAzLDI0LjcxNjA5MDcgMTkuNTY1ODYwOSwyNC4wMTQ5OTAxIDE5LjU2NTg2MDksMjMuMTUwMTM4OCBMMTkuNTY1ODYwOSwxMi44MjA2OTAxIEMxOS41NjU4NjA5LDExLjk1NTgzODcgMTguODY0NzYwMywxMS4yNTQ3MzgxIDE3Ljk5OTkwODksMTEuMjU0NzM4MSBMMTcuOTk5OTA4OSwxMS4yNTQ3MzgxIEMxNy4xMzUwNTc2LDExLjI1NDczODEgMTYuNDMzOTU3LDExLjk1NTgzODcgMTYuNDMzOTU3LDEyLjgyMDY5MDEgTDE2LjQzMzk1NywyMy4xNTAxMzg4IEMxNi40MzM5NTcsMjQuMDE0OTkwMSAxNy4xMzUwNTc2LDI0LjcxNjA5MDcgMTcuOTk5OTA4OSwyNC43MTYwOTA3IFoiIGlkPSJleGNsYW1hdGlvbi1jb3B5IiBmaWxsLW9wYWNpdHk9IjAuNjUiIGZpbGw9IiMyNjI2MjYiPjwvcGF0aD48L2c+PC9nPjwvZz48L2c+PC9zdmc+' }
                 },
                 {
                     name: 'Invalid token (default error text)',
@@ -350,6 +377,13 @@
                     const exampleEl = document.createElement('div');
                     exampleEl.className = group.className;
                     const exampleDataset = example.dataset
+
+                    if (exampleEl.className.match('new-container')) {
+                        exampleDataset.newsizespec = true;
+                    } else {
+                        exampleDataset.newsizespec = false;
+                    }
+
                     Object.keys(exampleDataset).forEach( attr => { exampleEl.dataset[attr] = exampleDataset[attr] });
 
                     exampleContainer.appendChild(exampleHeader);
@@ -375,6 +409,10 @@
                 token.id = 'seview-container-' + Math.round(Math.random() * 1e10);
 
                 const options = { selector: '#' + token.id };
+
+                if (token.dataset.newsizespec === 'true') {
+                    options.containerSize = Presence.containerSizes.SIZE_278x127;
+                }
 
                 token.dataset.parseerrortext && (options.errorText = token.dataset.parseerrortext === 'null' ? null : token.dataset.parseerrortext);
 

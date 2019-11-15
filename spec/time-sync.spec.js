@@ -126,8 +126,33 @@ describe('time sync', () => {
                 done();
             });
 
-            clock.tick(3500);
+            clock.tick(15000);
             clock.restore();
+        }).timeout(16000); // Increase test timeout beyond default 2 seconds.
+
+        it('should cache time delta with TTL of 1 minute', done => {
+            const now = new Date();
+            const then = new Date(now.getTime() + 10000);
+
+            // Cache should be empty
+            expect(timeSync.getCachedTimeDelta()).to.equal(0);
+
+            timeSync.syncTime(null, actualDelta => {
+                const expectedDelta = 10000;
+                expectToBeWithinThreshold(actualDelta, expectedDelta);
+
+                // Cache should be populated
+                expectToBeWithinThreshold(timeSync.getCachedTimeDelta(), expectedDelta);
+
+                // Cache expiration should be in 1 minute
+                const cachedData = JSON.parse(localStorage.getItem(timeSync.storageKey));
+                const cacheExpiry = new Date(cachedData.ts);
+                expectToBeWithinThreshold(now.getTime() + 60 * 1000, cacheExpiry.getTime());
+
+                done();
+            });
+
+            requests[0].respond(200, {}, JSON.stringify({ serverTime: then.toISOString() }));
         });
 
         it('should handle multiple sync attempts', () => {

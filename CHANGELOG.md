@@ -3,6 +3,22 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [1.0.7] - 2019-11-15
+#### Improved
+- Update SafeTix subtitle font size and padding.
+- Remove SafeTix QR code fallback. Tapping a SafeTix barcode will no longer display a QR code.
+- Add support for 278x127 sized SafeTix variant. To enabled this variant, set the `containerSize`
+  when configuring the `SecureEntryView`. Supported sizes are:
+  - Presence.containerSizes.SIZE_216x160 (Default)
+  - Presence.containerSizes.SIZE_278x127
+
+#### Fixed
+- Resolve critical security vunerabilities with jsdoc, karma and karma-coverage dev dependencies.
+
+## [1.0.6] - 2019-10-21
+- Increase client-side timeout for time sync calls to account for poor network connection.
+- Decrease cached time delta TTL to allow shorter time for updating an old time delta.
+
 ## [1.0.5] - 2019-07-17
 - Update time server resource URL.
 

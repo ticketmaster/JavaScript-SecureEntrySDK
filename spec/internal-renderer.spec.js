@@ -7,7 +7,7 @@ const timeSync = require('../src/helpers/time-sync');
 timeSync.syncTime(0);
 
 const tokenSecureToken = objectToEncodedToken({ b: 'b', t: 't', ck: 'ck' });
-const barcodeSecureToken = objectToEncodedToken({ b: 'b' });
+const barcodeSecureToken = objectToEncodedToken({ b: 'b', rt: 'BARCODE' });
 const DEFAULT_BRANDING_COLOR = '#076CD9';
 
 describe('internal-renderer', () => {
@@ -226,7 +226,8 @@ describe('internal-renderer', () => {
             renderer.token = tokenSecureToken;
             const el = containerNode.querySelector('div[id*=psetokenview]');
             const padding = containerWidth * pdf417.paddingPercentage;
-            const expectedContainerHeight = pdf417.minHeight + padding;
+            const subtitleHeight = 38;
+            const expectedContainerHeight = pdf417.minHeight + padding + subtitleHeight;
             expect(el).to.exist;
             expect(el.clientHeight).to.equal(expectedContainerHeight);
         });

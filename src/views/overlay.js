@@ -19,14 +19,14 @@ export class OverlayView {
             {
                 backgroundColor: color,
                 width: `${padding * 0.5}px`,
-                height: '100%',
+                height: `${height - padding}px`,
                 left: '2px',
-                top: '0px',
+                top: `${padding * 0.5}px`,
                 ...sharedCSS
             }
         );
 
-        const secondaryOverlayHeight = height - padding;
+        const secondaryOverlayHeight = height - (padding * 2);
         const secondaryOverlay = createElement(
             'div',
             null,
@@ -36,7 +36,7 @@ export class OverlayView {
                 width: `${padding}px`,
                 height: `${secondaryOverlayHeight}px`,
                 left: '0px',
-                top: `${(height - secondaryOverlayHeight) * 0.5}px`,
+                top: `${padding}px`,
                 ...sharedCSS
             }
         );

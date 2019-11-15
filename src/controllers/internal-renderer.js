@@ -7,9 +7,12 @@ import { EntryData, DisplayType } from '../models/entry-data';
 import { ErrorView } from '../views/error-view';
 import { StaticBarcodeView } from '../views/static-barcode-view';
 import { SecureTokenView } from '../views/secure-token-view';
-import { ToggleButton } from '../views/toggle-button';
 import { LoadingView } from '../views/loading-view';
-import { container as containerDimensions } from '../helpers/dimensions';
+import {
+    container as legacyDimensions,
+    containerNew as newDimensions,
+    containerSizes
+} from '../helpers/dimensions';
 import * as timeSync from '../helpers/time-sync';
 
 const DEFAULT_BRANDING_COLOR = '#076CD9';
@@ -17,7 +20,7 @@ const REFRESH_INTERVAL = 15;
 const HEX_COLOR_WITH_ALPHA_REGEX = /(#\w{6})\w{2}$/;
 const SHORTHAND_HEX_COLOR_WITH_ALPHA_REGEX = /(#\w{3})\w$/;
 const COLOR_FUNCTION_REGEX = /(\w+?)a?\((.+?)\)$/;
-const DEFAULT_BARCODE_SUBTITLE = 'Screenshots are not valid';
+const DEFAULT_BARCODE_SUBTITLE = `Screenshots won't get you in.`;
 
 /**
  * Render Modes
@@ -87,9 +90,6 @@ export class InternalRenderer {
          */
         this.qrCodeSubtitle = DEFAULT_BARCODE_SUBTITLE;
 
-        /** @type ToggleButton */
-        this._toggleButton = null;
-
         /** @type EntryData */
         this._entryData = null;
 
@@ -104,6 +104,7 @@ export class InternalRenderer {
     setConfiguration(options = {}) {
         // We must access private members directly to avoid accidently
         // triggering multiple renders with the accessors.
+        this._useNewSpec = containerSizes.hasOwnProperty(`SIZE_${options.containerSize}`);
         this._containerNode = options.containerNode;
         this.updateBarcodeContainerSize();
 
@@ -270,8 +271,9 @@ export class InternalRenderer {
         if (this._containerNode) {
             (this.mode === RenderModes.IMMEDIATE) && this._containerNode.appendChild(this._rootEl);
 
-            const width = Math.max(this._containerNode.clientWidth, containerDimensions.minWidth);
-            const height = Math.ceil(width * containerDimensions.ratio);
+            const dimensions = (this._useNewSpec) ? newDimensions : legacyDimensions;
+            const width = Math.max(this._containerNode.clientWidth, dimensions.minWidth);
+            const height = Math.ceil(width * dimensions.ratio);
 
             utils.applyStyle(this._rootEl, {
                 width: `${width}px`,
@@ -320,7 +322,8 @@ export class InternalRenderer {
             h: this._rootEl.clientHeight,
             color: this.brandingColor || DEFAULT_BRANDING_COLOR,
             errorText: this.parseErrorText,
-            useBrandingColorForSubtitle: this.isBrandingColoredSubtitleEnabled
+            useBrandingColorForSubtitle: this.isBrandingColoredSubtitleEnabled,
+            useNewSpec: this._useNewSpec
         };
 
         if (this.error) {
@@ -367,8 +370,6 @@ export class InternalRenderer {
      * @param {Object} viewOptions - The view options used in class creation.
      */
     setupSafeTixView(viewOptions) {
-        this.setupSimpleView(StaticBarcodeView, { subtitle: this.qrCodeSubtitle, ...viewOptions }, false);
-
         this._secureTokenView = new SecureTokenView({
             subtitle: this.pdf417Subtitle,
             ...viewOptions
@@ -386,20 +387,8 @@ export class InternalRenderer {
                 }, REFRESH_INTERVAL * 1000);
             }
 
-            // Add toggle button
-            this._toggleButton = new ToggleButton({
-                ...viewOptions,
-                onToggle: () => utils.swapElementStyles(this._secureTokenView.el, this._barcodeView.el, ['opacity'])
-            });
-
-            // Reposition views as SecureTokenView should now be primary
             utils.applyStyle(this._secureTokenView.el, { top: '0px', opacity: 0 });
-            utils.applyStyle(this._barcodeView.el, { opacity: 0 });
-            utils.applyStyle(this._toggleButton.el, { opacity: 0 });
-
             this._rootEl.appendChild(this._secureTokenView.el);
-            this._rootEl.appendChild(this._toggleButton.el);
-
             utils.swapElementStyles(this._loadingView.el, this._secureTokenView.el, ['opacity']);
         });
     }
