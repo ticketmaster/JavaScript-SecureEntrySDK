@@ -12,11 +12,11 @@ AMD CDN Link: https://secure-entry.ticketmaster.com/presence-secure-entry.amd.mi
 
 Secure Token:
 
-![pdf417](img/js-pdf417.png)
+![pdf417](static/img/js-pdf417.png)
 
 QR code fallback:
 
-![qr code](img/js-qrcode.png)
+![qr code](static/img/js-qrcode.png)
 
 ## Usage
 
