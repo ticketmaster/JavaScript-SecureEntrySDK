@@ -3,6 +3,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [1.0.8] - 2020-06-17
+### Improved
+- Removed SafeTix TOTP counter padding to confirm with PDF417 RFC standard.
+
+### Fixed
+- Fixed static image paths in Integration Guide
+
 ## [1.0.7] - 2019-11-15
 #### Improved
 - Update SafeTix subtitle font size and padding.

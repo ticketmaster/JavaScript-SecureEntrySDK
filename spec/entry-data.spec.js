@@ -171,35 +171,36 @@ describe('EntryData', () => {
             const [, originalToken, ektotp, cktotp, timestamp] = signedToken.match(/(.+?)::([0-9]{6})::([0-9]{6})::([0-9]+)/) || [];
 
             expect(originalToken, 'token').to.equal(decodedRETWithEventKey.t);
-            expect(ektotp, 'ektotp').to.equal('958774');
-            expect(cktotp, 'cktotp').to.equal('269251');
+            expect(ektotp, 'ektotp').to.equal('027612');
+            expect(cktotp, 'cktotp').to.equal('376211');
             expect(timestamp, 'timestamp').to.equal('1548364791');
         });
 
+        const totpTestToken = {
+            b: '012801000001',
+            t: 'TM::03::3g14cs4cs8p73o9ccpoovht2ua8svwnmknxbirt8eahfg8my9',
+            ck: '3d27b77eb8bf1d227b54fda89783843aabe248e5'
+        };
+
+        const totpTestTime = 1548364791161;
+
+        it('should generate proper TOTP without padding by default', () => {
+            let entryData = new EntryData(objectToEncodedToken(totpTestToken));
+            const signedToken = entryData.generateSignedToken(totpTestTime);
+            const [, , totp] = signedToken.match(RegExp(`(TM::.+::.+)::(.+)`)) || [];
+            expect(totp).to.equal('376211');
+        });
+
         it('should generate proper TOTP without padding', () => {
-            let token = {
-                b: '012801000001',
-                t: 'TM::03::3g14cs4cs8p73o9ccpoovht2ua8svwnmknxbirt8eahfg8my9',
-                ck: '3d27b77eb8bf1d227b54fda89783843aabe248e5'
-            };
-
-            let entryData = new EntryData(objectToEncodedToken(token));
-
-            const signedToken = entryData.generateSignedToken(1548364791161, false);
+            let entryData = new EntryData(objectToEncodedToken(totpTestToken));
+            const signedToken = entryData.generateSignedToken(totpTestTime, false);
             const [, , totp] = signedToken.match(RegExp(`(TM::.+::.+)::(.+)`)) || [];
             expect(totp).to.equal('376211');
         });
 
         it('should generate proper TOTP with padding', () => {
-            let token = {
-                b: '012801000001',
-                t: 'TM::03::3g14cs4cs8p73o9ccpoovht2ua8svwnmknxbirt8eahfg8my9',
-                ck: '3d27b77eb8bf1d227b54fda89783843aabe248e5'
-            };
-
-            let entryData = new EntryData(objectToEncodedToken(token));
-
-            const signedToken = entryData.generateSignedToken(1548364791161, true);
+            let entryData = new EntryData(objectToEncodedToken(totpTestToken));
+            const signedToken = entryData.generateSignedToken(totpTestTime, true);
             const [, , totp] = signedToken.match(RegExp(`(TM::.+::.+)::(.+)`)) || [];
             expect(totp).to.equal('269251');
         });

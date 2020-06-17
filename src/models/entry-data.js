@@ -100,7 +100,7 @@ export class EntryData {
      * ROTATING_SYMBOLOGY and we have an encoded token, otherwise return the
      * barcode string.
      */
-    generateSignedToken(time, withCounterPadding = true) {
+    generateSignedToken(time, withCounterPadding = false) {
         if (this.displayType === DisplayType.ROTATING) {
             const keys = [this.eventKey, this.customerKey];
 
